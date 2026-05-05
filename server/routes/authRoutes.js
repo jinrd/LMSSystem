@@ -9,7 +9,22 @@ const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 // [API] 1. 회원가입
 router.post("/register", async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, termsAgreed } = req.body;
+
+    // 필수 입력값 및 데이터 타입 검증
+    if ((!email, !password, !name)) {
+      return res
+        .status(400)
+        .json({ message: "모든 필수 항목을 입력해주세요." });
+    }
+
+    // 약관 동의 검증 (동의하지 않으면 회원가입 거부)
+    if (!termsAgreed) {
+      return res.status(400).json({
+        message:
+          "이용약관 및 개인정보 처리방침에 동의해야 회원가입이 가능합니다.",
+      });
+    }
 
     // 이메일 중복 체크
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -27,12 +42,18 @@ router.post("/register", async (req, res) => {
         email,
         password: hashedPassword,
         name,
+        termsAgreed, // 약관 동의 받은 값
       },
     });
 
-    res
-      .status(201)
-      .json({ message: "회원가입이 완료되었습니다.", userId: newUser.id });
+    res.status(201).json({
+      message: "회원가입이 완료되었습니다.",
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name,
+      },
+    });
   } catch (error) {
     console.error("Registration Error:", error);
     res.status(500).json({ error: "서버 오류가 발생했습니다." });
@@ -46,7 +67,6 @@ router.post("/login", async (req, res) => {
 
     // 유저 조회
     const user = await prisma.user.findUnique({ where: { email } });
-    console.log("로그인 유저 조회 : {}", user);
     if (!user) {
       return res
         .status(401)

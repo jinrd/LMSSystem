@@ -1,41 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Users, Mail, Calendar, User as UserIcon } from 'lucide-react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { LogOut, Users, Mail, Calendar, User as UserIcon } from "lucide-react";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const token = localStorage.getItem('lms_token');
-      
+      const token = localStorage.getItem("lms_token");
+
       if (!token) {
-        alert('로그인이 필요합니다.');
-        navigate('/login');
+        alert("로그인이 필요합니다.");
+        navigate("/login");
         return;
       }
 
       try {
-        const response = await fetch('http://localhost:5001/api/users', {
+        const response = await fetch("http://localhost:5001/api/users", {
           headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem('lms_token');
-          alert('인증이 만료되었습니다. 다시 로그인해 주세요.');
-          navigate('/login');
+          localStorage.removeItem("lms_token");
+          alert("인증이 만료되었습니다. 다시 로그인해 주세요.");
+          navigate("/login");
           return;
         }
 
         const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.error || '목록을 불러오지 못했습니다.');
-        
+
+        if (!response.ok)
+          throw new Error(data.error || "목록을 불러오지 못했습니다.");
+
         setUsers(data);
       } catch (err) {
         setErrorMsg(err.message);
@@ -48,8 +50,8 @@ export default function UserList() {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('lms_token');
-    navigate('/login');
+    localStorage.removeItem("lms_token");
+    navigate("/login");
   };
 
   return (
@@ -62,7 +64,9 @@ export default function UserList() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-800">회원 목록</h1>
-              <p className="text-slate-500 text-sm">LMS 시스템에 가입된 모든 사용자</p>
+              <p className="text-slate-500 text-sm">
+                LMS 시스템에 가입된 모든 사용자
+              </p>
             </div>
           </div>
           <button
@@ -88,27 +92,41 @@ export default function UserList() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/50 border-b border-slate-100">
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">이름</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">이메일</th>
-                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">가입일</th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      이름
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      이메일
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      가입일
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {users.length === 0 ? (
                     <tr>
-                      <td colSpan="3" className="px-6 py-12 text-center text-slate-500">
+                      <td
+                        colSpan="3"
+                        className="px-6 py-12 text-center text-slate-500"
+                      >
                         가입된 회원이 없습니다.
                       </td>
                     </tr>
                   ) : (
                     users.map((user) => (
-                      <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
+                      <tr
+                        key={user.id}
+                        className="hover:bg-slate-50/50 transition-colors"
+                      >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                               <UserIcon className="w-4 h-4" />
                             </div>
-                            <span className="font-medium text-slate-800">{user.name}</span>
+                            <span className="font-medium text-slate-800">
+                              {user.name}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -120,11 +138,14 @@ export default function UserList() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-slate-600">
                             <Calendar className="w-4 h-4 text-slate-400" />
-                            {new Date(user.createdAt).toLocaleDateString('ko-KR', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
+                            {new Date(user.createdAt).toLocaleDateString(
+                              "ko-KR",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              },
+                            )}
                           </div>
                         </td>
                       </tr>
