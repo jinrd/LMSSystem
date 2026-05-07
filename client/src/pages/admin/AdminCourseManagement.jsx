@@ -20,7 +20,7 @@ export default function AdminCourseManagement() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("lms_token");
         const response = await fetch("http://localhost:5001/api/courses", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -133,7 +133,7 @@ export default function AdminCourseManagement() {
     if (!window.confirm("정말로 이 강의를 삭제하시겠습니까?")) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("lms_token");
 
       // DELETE: URL에 삭제할 ID 포함
       const response = await fetch(`http://localhost:5001/api/courses/${id}`, {

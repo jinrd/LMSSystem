@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
+const { JWT_SECRET } = require("../config");
 
 // 1. 토큰 검증 미들웨어
 const verifyToken = (req, res, next) => {

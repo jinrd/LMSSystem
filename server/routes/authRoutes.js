@@ -2,9 +2,9 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const prisma = require("../prismaClient");
+const { JWT_SECRET } = require("../config");
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 
 // [API] 1. 회원가입
 router.post("/register", async (req, res) => {
@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
     const { email, password, name, termsAgreed } = req.body;
 
     // 필수 입력값 및 데이터 타입 검증
-    if ((!email, !password, !name)) {
+    if (!email || !password || !name) {
       return res
         .status(400)
         .json({ message: "모든 필수 항목을 입력해주세요." });
