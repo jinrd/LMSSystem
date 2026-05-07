@@ -1,12 +1,27 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut, Users, Mail, Calendar, User as UserIcon } from "lucide-react";
+import {
+  LogOut,
+  Users,
+  Mail,
+  Calendar,
+  User as UserIcon,
+  Search,
+} from "lucide-react";
+
+// 역할군 한글로 변경
+const roleMap = {
+  ADMIN: "원장",
+  TEACHER: "강사",
+  STUDENT: "수강생",
+};
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +69,44 @@ export default function UserList() {
     navigate("/login");
   };
 
+  const handleRoleChange = async (userId, newRole) => {
+    const token = localStorage.getItem("lms_token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/users/${userId}/role`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role: newRole }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("역할 변경에 실패했습니다.");
+      }
+
+      // 성공 시 화면의 사용자 목록도 업데이트
+      setUsers(
+        users.map((user) =>
+          user.id === userId ? { ...user, role: newRole } : user,
+        ),
+      );
+
+      alert("역할이 성공적으로 변경되었습니다.");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // 검색어에 맞게 유저 필터링 기능
+  const filteredUsers = users.filter(
+    (user) => user.name.includes(searchTerm) || user.email.includes(searchTerm),
+  );
+
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-5xl mx-auto">
@@ -77,6 +130,17 @@ export default function UserList() {
             로그아웃
           </button>
         </div>
+        {/* 가입자 검색 UI 추가 */}
+        <div className="mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3">
+          <Search className="w-5 h-5 text-slate-400" />
+          <input
+            type="text"
+            placeholder="이름 또는 이메일로 검색하세요..."
+            className="w-full bg-transparent border-none outline-none text-slate-700"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         {errorMsg ? (
           <div className="p-4 text-sm font-medium text-red-600 bg-red-50 rounded-xl border border-red-100">
@@ -99,22 +163,25 @@ export default function UserList() {
                       이메일
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      직급
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       가입일
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {users.length === 0 ? (
+                  {filteredUsers.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="3"
+                        colSpan="4"
                         className="px-6 py-12 text-center text-slate-500"
                       >
                         가입된 회원이 없습니다.
                       </td>
                     </tr>
                   ) : (
-                    users.map((user) => (
+                    filteredUsers.map((user) => (
                       <tr
                         key={user.id}
                         className="hover:bg-slate-50/50 transition-colors"
@@ -134,6 +201,19 @@ export default function UserList() {
                             <Mail className="w-4 h-4 text-slate-400" />
                             {user.email}
                           </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <select
+                            value={user.role || "STUDENT"}
+                            onChange={(e) =>
+                              handleRoleChange(user.id, e.target.value)
+                            }
+                            className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 outline-none cursor-pointer"
+                          >
+                            <option value="ADMIN">{roleMap.ADMIN}</option>
+                            <option value="TEACHER">{roleMap.TEACHER}</option>
+                            <option value="STUDENT">{roleMap.STUDENT}</option>
+                          </select>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-slate-600">
