@@ -51,7 +51,9 @@ const PublicRoute = ({ children }) => {
   const role = localStorage.getItem("role");
 
   if (token) {
-    return <Navigate to={role === "ADMIN" ? "/users" : "/dashboard"} replace />;
+    return (
+      <Navigate to={role === "ADMIN" ? "/admin/users" : "/dashboard"} replace />
+    );
   }
 
   return children;
@@ -93,7 +95,7 @@ function App() {
 
       {/* [관리자용] 오직 관리자만 접근 가능 */}
       <Route
-        path="/users"
+        path="/admin/users"
         element={
           <AdminRoute>
             <UserList />
