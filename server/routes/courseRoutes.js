@@ -48,15 +48,13 @@ router.post("/", verifyToken, isAdmin, async (req, res) => {
     });
 
     console.log("[POST /] 성공: 새 강의 생성됨 -> ID:", newCourse.id);
-    return res.status(201).json({
+    res.status(201).json({
       message: "강의가 성공적으로 등록되었습니다.",
-      course: newCourse
+      course: newCourse,
     });
   } catch (error) {
     console.error("[POST /] 에러 상세:", error);
-    return res
-      .status(500)
-      .json({ error: "강의 등록 중 서버 오류가 발생했습니다." });
+    res.status(500).json({ error: "강의 등록 중 서버 오류가 발생했습니다." });
   }
 });
 
@@ -73,13 +71,13 @@ router.put("/:id", verifyToken, isAdmin, async (req, res) => {
     });
 
     console.log(`[PUT /${id}] 수정 성공`);
-    return res.status(200).json({
+    res.status(200).json({
       message: "강의가 수정되었습니다.",
       course: updatedCourse,
     });
   } catch (error) {
     console.error(`[PUT /${id}] 수정 에러:`, error);
-    return res.status(500).json({
+    res.status(500).json({
       message: "강의 수정 실패 또는 존재하지 않는 강의입니다.",
     });
   }
