@@ -42,3 +42,12 @@ model Course {
   @@index([title])
   @@index([instructor])
 }
+
+model Notice {
+  id          Int   @id @default(autoincrement())
+  title       String
+  content     String
+  authorId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

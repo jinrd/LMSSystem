@@ -4,7 +4,9 @@ import Register from "./pages/common/Register";
 import UserList from "./pages/admin/UserList";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import AdminCourseManagement from "./pages/admin/AdminCourseManagement";
-
+import NoticeList from "./pages/common/NoticeList";
+import NoticeDetail from "./pages/common/NoticeDetail";
+import NoticeForm from "./pages/common/NoticeForm";
 /**
  * 1. 관리자 전용 보호 라우트
  * - 관리자(ADMIN)만 접근 가능
@@ -84,6 +86,25 @@ function App() {
       />
 
       {/* [학생용/공통] 학생과 관리자 모두 접근 가능 */}
+      <Route path="/notices" element={<NoticeList />} />
+      <Route path="/notices/:id" element={<NoticeDetail />} />
+      <Route
+        path="/notices/create"
+        element={
+          <AdminRoute>
+            <NoticeForm />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/notices/edit/:id"
+        element={
+          <AdminRoute>
+            <NoticeForm />
+          </AdminRoute>
+        }
+      />
+
       <Route
         path="/dashboard"
         element={

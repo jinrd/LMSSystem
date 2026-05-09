@@ -7,7 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const termsRoutes = require("./routes/termsRoutes");
 const courseRoutes = require("./routes/courseRoutes");
-
+const noticeRoutes = require("./routes/noticeRoutes");
 const app = express();
 const PORT = process.env.PORT || 5001;
 
@@ -20,6 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/terms", termsRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/notices", noticeRoutes);
 
 app.listen(PORT, () => {
   console.log(`Backend server is running on http://localhost:${PORT}`);
