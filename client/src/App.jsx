@@ -7,6 +7,8 @@ import AdminCourseManagement from "./pages/admin/AdminCourseManagement";
 import NoticeList from "./pages/common/NoticeList";
 import NoticeDetail from "./pages/common/NoticeDetail";
 import NoticeForm from "./pages/common/NoticeForm";
+import AdminSchedule from "./pages/admin/AdminSchedule";
+
 /**
  * 1. 관리자 전용 보호 라우트
  * - 관리자(ADMIN)만 접근 가능
@@ -128,6 +130,14 @@ function App() {
         element={
           <AdminRoute>
             <AdminCourseManagement />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/schdule"
+        element={
+          <AdminRoute>
+            <AdminSchedule />
           </AdminRoute>
         }
       />

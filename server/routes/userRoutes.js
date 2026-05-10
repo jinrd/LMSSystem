@@ -8,8 +8,14 @@ const router = express.Router();
 // 앞서 server.js에 설정한 기본 경로가 /api/users 이므로, 여기서는 '/' 경로를 사용합니다.
 router.get("/", verifyToken, isAdmin, async (req, res) => {
   try {
+    const { role } = req.query; // 쿼리 파라미터에서 role 가져오기
+
+    // 역할 파라미터가 있으면 where 조건 추가
+    const whereCondition = role ? { role: role } : {};
+
     // 비밀번호를 제외한 정보만 가져오기
     const users = await prisma.user.findMany({
+      where: whereCondition,
       select: {
         id: true,
         email: true,

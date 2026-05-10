@@ -84,7 +84,6 @@ export default function NoticeForm() {
           뒤로가기
         </button>
       </div>
-
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-8 border-b border-gray-100 bg-gray-50/50">
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
@@ -124,7 +123,9 @@ export default function NoticeForm() {
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
-              onClick={() => navigate(isEditMode ? `/notices/${id}` : "/notices")}
+              onClick={() =>
+                navigate(isEditMode ? `/notices/${id}` : "/notices")
+              }
               className="flex items-center px-6 py-3 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl transition-all shadow-sm font-medium"
             >
               <X className="w-4 h-4 mr-2" />

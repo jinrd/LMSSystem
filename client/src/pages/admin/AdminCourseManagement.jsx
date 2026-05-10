@@ -1,42 +1,48 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/immutability */
+// client/src/pages/admin/AdminCourseManagement.jsx
 import React, { useState, useEffect } from "react";
+import AdminClassModal from "../../components/AdminClassModal";
 
 export default function AdminCourseManagement() {
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // 수강 입력 폼 상태
   const [formData, setFormData] = useState({
     id: "",
     title: "",
-    instructor: "",
-    capacity: "",
+    description: "",
   });
-
   const [isEditing, setIsEditing] = useState(false);
 
-  // 컴포넌트 마운트 시 강의 목록 조회
+  // 모달 제어용 상태
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const token = localStorage.getItem("lms_token");
-        const response = await fetch("http://localhost:5001/api/courses", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok) throw new Error("강의 데이터를 불러오지 못했습니다.");
-        const data = await response.json(); // 수정: json()으로 파싱
-        setCourses(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const token = localStorage.getItem("lms_token");
+      const res = await fetch("http://localhost:5001/api/courses", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCourses(data);
+
+        // ✨ [추가된 부분] 새로고침 후, 모달이 열려있다면 모달 안의 데이터도 최신으로 교체!
+        setSelectedCourse((prev) =>
+          prev ? data.find((c) => c.id === prev.id) || prev : null,
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -44,190 +50,130 @@ export default function AdminCourseManagement() {
   };
 
   const resetForm = () => {
-    setFormData({ id: "", title: "", instructor: "", capacity: "" });
+    setFormData({ id: "", title: "", description: "" });
     setIsEditing(false);
-  };
-
-  const handleEditClick = (course) => {
-    setFormData({ ...course });
-    setIsEditing(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!formData.title || !formData.instructor || !formData.capacity) {
-      alert("모든 항목을 입력해주세요.");
-      return;
-    }
+    if (!formData.title) return alert("과목명을 입력해주세요.");
 
     try {
       setIsLoading(true);
       const token = localStorage.getItem("lms_token");
+      const url = isEditing
+        ? `http://localhost:5001/api/courses/${formData.id}`
+        : "http://localhost:5001/api/courses";
+      const method = isEditing ? "PUT" : "POST";
 
-      // 공통 헤더 설정 (Content-Type 필수 추가)
-      const headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      };
-      console.log("headers : {}", headers);
-      if (isEditing) {
-        // PUT: 특정 ID를 URL에 포함하는 것이 일반적인 RESTful 방식입니다.
-        const response = await fetch(
-          `http://localhost:5001/api/courses/${formData.id}`,
-          {
-            method: "PUT",
-            headers,
-            body: JSON.stringify(formData),
-          },
-        );
+      console.log("수정 url : {}", url);
 
-        const data = await response.json(); // 응답 데이터 파싱
+      const res = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+        }),
+      });
 
-        if (response.ok) {
-          const updatedCourse = data.course;
-          setCourses(
-            courses.map((c) => (c.id === updatedCourse.id ? updatedCourse : c)),
-          );
-          alert("수정되었습니다.");
-          resetForm();
-        } else {
-          alert(data.message || "수정에 실패했습니다.");
-        }
+      if (res.ok) {
+        alert(isEditing ? "과목이 수정되었습니다." : "과목이 등록되었습니다.");
+        fetchCourses(); // 갱신된 데이터 다시 불러오기
+        resetForm();
       } else {
-        // POST: 신규 등록
-
-        console.log("formData : {}", formData);
-        const response = await fetch("http://localhost:5001/api/courses", {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            title: formData.title,
-            instructor: formData.instructor,
-            capacity: formData.capacity,
-          }),
-        });
-
-        const data = await response.json(); // 응답 데이터 파싱
-
-        if (response.ok) {
-          const newCourse = data.course;
-          // 수정: 기존 map 대신 배열 맨 앞에 새 데이터를 추가
-          setCourses([newCourse, ...courses]);
-          alert("등록되었습니다.");
-          resetForm();
-        } else {
-          alert(data.message || "등록에 실패했습니다.");
-        }
+        alert("처리에 실패했습니다.");
       }
     } catch (error) {
-      setError(error.message);
-      // 수정: 올바른 JavaScript 템플릿 리터럴 문법 사용
-      alert(`작업 처리 중 오류가 발생했습니다 : ${error.message}`);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("정말로 이 강의를 삭제하시겠습니까?")) return;
-
+    if (
+      !window.confirm(
+        "정말 삭제하시겠습니까? 관련된 강좌도 모두 삭제될 수 있습니다.",
+      )
+    )
+      return;
     try {
       const token = localStorage.getItem("lms_token");
-
-      // DELETE: URL에 삭제할 ID 포함
-      const response = await fetch(`http://localhost:5001/api/courses/${id}`, {
+      const res = await fetch(`http://localhost:5001/api/courses/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (response.ok) {
-        // 성공 시 목록에서 해당 ID 제거
-        setCourses(courses.filter((c) => c.id !== id));
+      if (res.ok) {
         alert("삭제되었습니다.");
-      } else {
-        const data = await response.json();
-        alert(data.message || "삭제에 실패했습니다.");
+        fetchCourses();
       }
     } catch (error) {
-      setError(error.message);
-      alert(`작업 처리 중 오류가 발생했습니다 : ${error.message}`);
+      console.error(error);
     }
+  };
+
+  const openClassManager = (course) => {
+    setSelectedCourse(course);
+    setIsModalOpen(true);
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        강의 관리 시스템 (ADMIN)
+        교육과정(과목) 관리
       </h1>
 
-      {/* 입력 폼 섹션 */}
+      {/* 과목 입력 폼 */}
       <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
-          {isEditing ? "강의 수정" : "신규 강의 등록"}
+        <h2 className="text-xl font-semibold mb-4">
+          {isEditing ? "과목 수정" : "신규 과목 등록"}
         </h2>
         <form
           onSubmit={handleSubmit}
           className="flex flex-wrap gap-4 items-end"
         >
-          {/* 하위 UI 코드는 기존 작성하신 내용과 100% 동일하게 유지했습니다. */}
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-[250px]">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              강의명
+              과목명 (예: 네일아트 마스터)
             </label>
             <input
               type="text"
               name="title"
               value={formData.title}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="강의명을 입력하세요"
+              className="w-full px-4 py-2 border rounded-lg"
+              required
             />
           </div>
-          <div className="flex-1 min-w-[150px]">
+          <div className="flex-1 min-w-[300px]">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              강사명
+              설명 (선택사항)
             </label>
             <input
               type="text"
-              name="instructor"
-              value={formData.instructor}
+              name="description"
+              value={formData.description || ""}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="강사명"
-            />
-          </div>
-          <div className="flex-1 min-w-[100px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              수용 인원
-            </label>
-            <input
-              type="number"
-              name="capacity"
-              value={formData.capacity}
-              onChange={handleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="0 명"
+              className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
           <div className="flex gap-2">
             <button
               type="submit"
               disabled={isLoading}
-              className={`px-6 py-2 text-white font-medium rounded-lg transition-colors ${
-                isEditing
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-indigo-600 hover:bg-indigo-700"
-              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
-              {isLoading ? "처리 중..." : isEditing ? "수정 완료" : "강의 등록"}
+              {isEditing ? "수정 완료" : "과목 등록"}
             </button>
             {isEditing && (
               <button
                 type="button"
                 onClick={resetForm}
-                disabled={isLoading}
-                className="px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                className="px-6 py-2 bg-gray-200 rounded-lg"
               >
                 취소
               </button>
@@ -236,19 +182,19 @@ export default function AdminCourseManagement() {
         </form>
       </div>
 
-      {/* 강의 목록 테이블 섹션 */}
+      {/* 과목 리스트 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                강의명
+                과목명
               </th>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                강사명
+                설명
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                수용 인원
+                개설 강좌 수
               </th>
               <th className="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                 관리
@@ -256,53 +202,60 @@ export default function AdminCourseManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading && courses.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
-                  데이터를 불러오는 중입니다...
+            {courses.map((course) => (
+              <tr key={course.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 font-medium text-gray-900">
+                  {course.title}
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {course.description || "-"}
+                </td>
+                <td className="px-6 py-4 text-center">
+                  <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                    {course.classes ? course.classes.length : 0}개 운영중
+                  </span>
+                </td>
+                <td className="px-6 py-4 text-center flex justify-center gap-3">
+                  {/* 핵심: 강좌 관리 모달 열기 버튼 */}
+                  <button
+                    onClick={() => openClassManager(course)}
+                    className="text-green-600 hover:text-green-900 font-medium"
+                  >
+                    강좌 관리
+                  </button>
+                  <button
+                    onClick={() => {
+                      setFormData(course);
+                      setIsEditing(true);
+                    }}
+                    className="text-indigo-600 hover:text-indigo-900"
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => handleDelete(course.id)}
+                    className="text-red-600 hover:text-red-900"
+                  >
+                    삭제
+                  </button>
                 </td>
               </tr>
-            ) : courses.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="px-6 py-8 text-center text-gray-500">
-                  등록된 강의가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              courses.map((course) => (
-                <tr
-                  key={course.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {course.title}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {course.instructor}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                    {course.capacity} 명
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
-                    <button
-                      onClick={() => handleEditClick(course)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handleDelete(course.id)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      삭제
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
+
+      {/* 모달 렌더링 */}
+      {isModalOpen && (
+        <AdminClassModal
+          course={selectedCourse}
+          onClose={() => {
+            setIsModalOpen(false);
+            fetchCourses();
+          }}
+          onUpdate={fetchCourses}
+        />
+      )}
     </div>
   );
 }
