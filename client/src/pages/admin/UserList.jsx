@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   Search,
 } from "lucide-react";
+import { userAPI } from "../../api";
 
 // 역할군 한글로 변경
 const roleMap = {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import { authAPI } from "../../api"; // 분리한 API 함수 import
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,27 +20,21 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      // 1. fetch 구문이 단 한 줄로 깔끔해짐
+      const data = await authAPI.login(formData);
 
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "로그인 실패");
-
-      // 로그인 성공 시 로컬 스토리지에 JWT 저장
+      // 2. 로그인 성공 시 로컬 스토리지에 JWT 저장
       localStorage.setItem("lms_token", data.token);
-      localStorage.setItem("role", data.role); // 역할 저장
+      localStorage.setItem("role", data.role);
       
-      // 역할에 따라 페이지 이동
+      // 3. 역할에 따라 페이지 이동
       if (data.role === "ADMIN") {
         navigate("/users");
       } else {
         navigate("/dashboard");
       }
     } catch (err) {
+      // Axios 인터셉터에서 가공한 에러 메시지 출력
       setErrorMsg(err.message);
     } finally {
       setIsLoading(false);

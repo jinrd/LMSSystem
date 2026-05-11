@@ -83,15 +83,7 @@ export default function Register() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5001/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.error || "회원가입 실패");
+      await authAPI.register(formData);
 
       alert("성공적으로 가입되었습니다. 로그인해 주세요.");
       navigate("/login");
@@ -240,5 +232,7 @@ export default function Register() {
         isLoading={modalConfig.isLoading}
       />
     </div>
+  );
+}
   );
 }

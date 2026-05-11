@@ -3,6 +3,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { noticeAPI } from "../../api"; // API 함수 import
 
 export default function NoticeList() {
   const [notices, setNotices] = useState([]);
@@ -15,26 +16,19 @@ export default function NoticeList() {
   useEffect(() => {
     const role = localStorage.getItem("role");
     setUserRole(role);
+    
+    const fetchNotices = async () => {
+      try {
+        const data = await noticeAPI.getNotices(page, limit);
+        setNotices(data.notices);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error("공지사항을 불러오는 중 오류 발생:", error.message);
+      }
+    };
+    
     fetchNotices();
   }, [page, limit]);
-
-  const fetchNotices = async () => {
-    const token = localStorage.getItem("lms_token");
-    try {
-      const res = await fetch(
-        `http://localhost:5001/api/notices?page=${page}&limit=${limit}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      const data = await res.json();
-      setNotices(data.notices);
-      setTotalPages(data.totalPages);
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">

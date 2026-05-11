@@ -12,6 +12,7 @@ export default function AdminEnrollmentModal({ classData, onClose, onUpdate }) {
   useEffect(() => {
     fetchEnrollments();
     fetchAllStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 1. 현재 이 강좌를 수강 중인 학생 목록 불러오기

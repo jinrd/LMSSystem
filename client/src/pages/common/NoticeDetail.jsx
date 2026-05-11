@@ -15,21 +15,12 @@ export default function NoticeDetail() {
     setUserRole(role);
 
     const fetchNotice = async () => {
-      const token = localStorage.getItem("lms_token");
       try {
-        const res = await fetch(`http://localhost:5001/api/notices/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setNotice(data);
-        } else {
-          alert("공지사항을 불러오는데 실패했습니다.");
-          navigate("/notices");
-        }
+        const data = await noticeAPI.getNoticeById(id);
+        setNotice(data);
       } catch (error) {
-        console.error(error);
+        alert("공지사항을 불러오는데 실패했습니다.");
+        navigate("/notices");
       }
     };
 
@@ -126,6 +117,10 @@ export default function NoticeDetail() {
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
       </div>
     </div>
   );

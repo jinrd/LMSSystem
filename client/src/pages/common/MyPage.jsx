@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from "react";
+import { userAPI } from "../../api";
 
 export default function MyPage() {
   const [userInfo, setUserInfo] = useState(null);
@@ -20,18 +21,11 @@ export default function MyPage() {
 
   const fetchMyInfo = async () => {
     try {
-      const token = localStorage.getItem("lms_token");
-      const res = await fetch("http://localhost:5001/api/users/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUserInfo(data);
-        setEditName(data.name);
-      }
+      const data = await userAPI.getMe();
+      setUserInfo(data);
+      setEditName(data.name);
     } catch (error) {
-      console.error(error);
+      console.error(error.message);
     } finally {
       setIsLoading(false);
     }

@@ -1,8 +1,5 @@
-const express = require("express");
+import AppError from "../utils/AppError";
 
-const router = express.Router();
-
-// 임시 약관 데이터 (실제 서비스에서는 DB나 외부 스토리지에서 불러옵니다)
 const termsData = {
   service: `
     <h3>제 1 조 (목적)</h3>
@@ -23,18 +20,13 @@ const termsData = {
   `,
 };
 
-// GET /api/terms/:type
-router.get("/:type", (req, res) => {
-  const { type } = req.params;
-
+const getTermsByType = (type: any) => {
   if (type !== "service" && type !== "privacy") {
-    return res.status(400).json({ message: "유효하지 않은 약관 타입입니다." });
+    throw new AppError("유효하지 않은 약관 타입입니다.", 400);
   }
+  return termsData[type as keyof typeof termsData];
+};
 
-  return res.status(200).json({
-    type,
-    content: termsData[type],
-  });
-});
-
-module.exports = router;
+export default {
+  getTermsByType,
+};

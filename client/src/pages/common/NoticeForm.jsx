@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Save, X } from "lucide-react";
+import { noticeAPI } from "../../api";
 
 export default function NoticeForm() {
   const { id } = useParams();
@@ -13,30 +14,21 @@ export default function NoticeForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (isEditMode) {
-      fectNotice();
-    }
-  }, [id]);
-
-  const fectNotice = async () => {
-    const token = localStorage.getItem("lms_token");
-    try {
-      const res = await fetch(`http://localhost:5001/api/notices/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (res.ok) {
-        const data = await res.json();
+    const fetchNoticeData = async () => {
+      try {
+        const data = await noticeAPI.getNoticeById(id);
         setTitle(data.title);
         setContent(data.content);
-      } else {
+      } catch (error) {
         alert("데이터를 불러오지 못했습니다.");
         navigate("/notices");
       }
-    } catch (error) {
-      console.error(error);
+    };
+
+    if (isEditMode) {
+      fetchNoticeData();
     }
-  };
+  }, [id, isEditMode, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,28 +37,17 @@ export default function NoticeForm() {
     }
 
     setIsLoading(true);
-    const token = localStorage.getItem("lms_token");
-    const method = isEditMode ? "PUT" : "POST";
-    const url = isEditMode
-      ? `http://localhost:5001/api/notices/${id}`
-      : `http://localhost:5001/api/notices`;
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ title, content }),
-      });
-      if (res.ok) {
-        navigate(isEditMode ? `/notices/${id}` : "/notices");
+      if (isEditMode) {
+        await noticeAPI.updateNotice(id, { title, content });
+        navigate(`/notices/${id}`);
       } else {
-        alert("저장에 실패했습니다.");
+        await noticeAPI.createNotice({ title, content });
+        navigate("/notices");
       }
     } catch (error) {
-      console.error(error);
+      alert("저장에 실패했습니다: " + error.message);
     } finally {
       setIsLoading(false);
     }
