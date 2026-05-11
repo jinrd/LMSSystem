@@ -66,8 +66,6 @@ export default function AdminCourseManagement() {
         : "http://localhost:5001/api/courses";
       const method = isEditing ? "PUT" : "POST";
 
-      console.log("수정 url : {}", url);
-
       const res = await fetch(url, {
         method,
         headers: {

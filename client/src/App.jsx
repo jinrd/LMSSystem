@@ -2,12 +2,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/common/Login";
 import Register from "./pages/common/Register";
 import UserList from "./pages/admin/UserList";
-import StudentDashboard from "./pages/student/StudentDashboard";
 import AdminCourseManagement from "./pages/admin/AdminCourseManagement";
 import NoticeList from "./pages/common/NoticeList";
 import NoticeDetail from "./pages/common/NoticeDetail";
 import NoticeForm from "./pages/common/NoticeForm";
 import AdminSchedule from "./pages/admin/AdminSchedule";
+import Layout from "./components/Layout";
+import DashboardSwitcher from "./pages/common/DashboardSwitcher";
 
 /**
  * 1. 관리자 전용 보호 라우트
@@ -32,7 +33,6 @@ const AdminRoute = ({ children }) => {
 /**
  * 2. 공통 보호 라우트 (학생 + 관리자)
  * - 관리자와 학생 모두 접근 가능 (사용자 전용)
- * - 관리자는 관리 권한으로, 학생은 본인 데이터 확인용으로 접근
  * - 로그인 안 되어 있으면 로그인 페이지로 이동
  */
 const PrivateRoute = ({ children }) => {
@@ -48,16 +48,13 @@ const PrivateRoute = ({ children }) => {
 
 /**
  * 3. 비로그인 전용 라우트 (로그인/회원가입)
- * - 이미 로그인한 사용자가 접근하면 각자의 메인으로 리다이렉트
+ * - 이미 로그인한 사용자가 접근하면 대시보드로 리다이렉트
  */
 const PublicRoute = ({ children }) => {
   const token = localStorage.getItem("lms_token");
-  const role = localStorage.getItem("role");
 
   if (token) {
-    return (
-      <Navigate to={role === "ADMIN" ? "/admin/users" : "/dashboard"} replace />
-    );
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -87,60 +84,63 @@ function App() {
         }
       />
 
-      {/* [학생용/공통] 학생과 관리자 모두 접근 가능 */}
-      <Route path="/notices" element={<NoticeList />} />
-      <Route path="/notices/:id" element={<NoticeDetail />} />
+      {/* [핵심] 로그인한 사용자만 접근 가능한 레이아웃 기반 라우트들 */}
       <Route
-        path="/notices/create"
-        element={
-          <AdminRoute>
-            <NoticeForm />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/notices/edit/:id"
-        element={
-          <AdminRoute>
-            <NoticeForm />
-          </AdminRoute>
-        }
-      />
-
-      <Route
-        path="/dashboard"
         element={
           <PrivateRoute>
-            <StudentDashboard />
+            <Layout />
           </PrivateRoute>
         }
-      />
+      >
+        {/* 공통 메인 페이지 (권한에 따라 Admin/Student 대시보드로 자동 분기) */}
+        <Route path="/dashboard" element={<DashboardSwitcher />} />
 
-      {/* [관리자용] 오직 관리자만 접근 가능 */}
-      <Route
-        path="/admin/users"
-        element={
-          <AdminRoute>
-            <UserList />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/courses"
-        element={
-          <AdminRoute>
-            <AdminCourseManagement />
-          </AdminRoute>
-        }
-      />
-      <Route
-        path="/admin/schdule"
-        element={
-          <AdminRoute>
-            <AdminSchedule />
-          </AdminRoute>
-        }
-      />
+        {/* [공통] 학생과 관리자 모두 접근 가능 */}
+        <Route path="/notices" element={<NoticeList />} />
+        <Route path="/notices/:id" element={<NoticeDetail />} />
+
+        {/* [관리자용] 오직 관리자만 접근 가능 */}
+        <Route
+          path="/notices/create"
+          element={
+            <AdminRoute>
+              <NoticeForm />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/notices/edit/:id"
+          element={
+            <AdminRoute>
+              <NoticeForm />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <AdminRoute>
+              <UserList />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/courses"
+          element={
+            <AdminRoute>
+              <AdminCourseManagement />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/schedule"
+          element={
+            <AdminRoute>
+              <AdminSchedule />
+            </AdminRoute>
+          }
+        />
+      </Route>
 
       {/* 잘못된 경로 처리 */}
       <Route path="*" element={<Navigate to="/login" replace />} />
