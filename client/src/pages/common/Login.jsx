@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
-import { authAPI } from "../../api"; // 분리한 API 함수 import
+import { authAPI } from "../../api";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,21 +20,17 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      // 1. fetch 구문이 단 한 줄로 깔끔해짐
       const data = await authAPI.login(formData);
 
-      // 2. 로그인 성공 시 로컬 스토리지에 JWT 저장
       localStorage.setItem("lms_token", data.token);
       localStorage.setItem("role", data.role);
       
-      // 3. 역할에 따라 페이지 이동
       if (data.role === "ADMIN") {
         navigate("/users");
       } else {
         navigate("/dashboard");
       }
     } catch (err) {
-      // Axios 인터셉터에서 가공한 에러 메시지 출력
       setErrorMsg(err.message);
     } finally {
       setIsLoading(false);
@@ -42,27 +38,33 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl border border-slate-100">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-slate-800">LMS 로그인</h2>
-          <p className="text-slate-500 mt-2">시스템에 접속하세요</p>
+    <div className="flex items-center justify-center min-h-screen mesh-bg p-4 relative overflow-hidden">
+      {/* 장식용 떠다니는 배경 요소 */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-float mix-blend-multiply"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl animate-float mix-blend-multiply" style={{ animationDelay: '2s' }}></div>
+
+      <div className="w-full max-w-md p-10 glass rounded-3xl z-10 animate-fade-in-up">
+        <div className="text-center mb-10">
+          <h2 className="text-4xl font-bold text-slate-800 tracking-tight mb-3">
+            LMS <span className="text-gradient">로그인</span>
+          </h2>
+          <p className="text-slate-500 font-medium">시스템에 접속하세요</p>
         </div>
 
         {errorMsg && (
-          <div className="mb-6 p-4 text-sm font-medium text-red-600 bg-red-50 rounded-xl border border-red-100">
+          <div className="mb-6 p-4 text-sm font-semibold text-red-600 bg-red-50/80 rounded-2xl border border-red-100 backdrop-blur-sm animate-fade-in-up">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               이메일
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-slate-400" />
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               </div>
               <input
                 type="email"
@@ -70,18 +72,18 @@ export default function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700"
+                className="w-full pl-12 pr-4 py-3.5 bg-white/60 border border-white/50 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
                 placeholder="lms@example.com"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               비밀번호
             </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-slate-400" />
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               </div>
               <input
                 type="password"
@@ -89,7 +91,7 @@ export default function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700"
+                className="w-full pl-12 pr-4 py-3.5 bg-white/60 border border-white/50 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-700 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]"
                 placeholder="••••••••"
               />
             </div>
@@ -97,7 +99,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 mt-2 text-white bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold shadow-lg shadow-blue-200 focus:ring-4 focus:ring-blue-100 transition-all active:scale-[0.98] disabled:opacity-70"
+            className="w-full py-4 mt-4 text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-2xl font-bold text-lg shadow-lg shadow-blue-500/30 focus:ring-4 focus:ring-blue-500/20 transition-all hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-70 disabled:hover:translate-y-0"
           >
             {isLoading ? "접속 중..." : "로그인"}
           </button>
@@ -106,7 +108,7 @@ export default function Login() {
           계정이 없으신가요?{" "}
           <Link
             to="/register"
-            className="text-blue-600 hover:text-blue-700 hover:underline"
+            className="text-blue-600 font-bold hover:text-blue-800 hover:underline transition-colors"
           >
             회원가입
           </Link>

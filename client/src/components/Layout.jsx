@@ -22,103 +22,78 @@ export default function Layout() {
     navigate("/login");
   };
 
-  // 관리자(ADMIN)용 사이드바 메뉴
   const adminMenus = [
-    {
-      name: "대시보드",
-      path: "/dashboard",
-      icon: <LayoutDashboard size={20} />,
-    },
+    { name: "대시보드", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "유저 관리", path: "/admin/users", icon: <Users size={20} /> },
-    {
-      name: "교육과정 관리",
-      path: "/admin/courses",
-      icon: <BookOpen size={20} />,
-    },
-    {
-      name: "전체 스케줄",
-      path: "/admin/schedule",
-      icon: <CalendarDays size={20} />,
-    },
+    { name: "교육과정 관리", path: "/admin/courses", icon: <BookOpen size={20} /> },
+    { name: "전체 스케줄", path: "/admin/schedule", icon: <CalendarDays size={20} /> },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
     { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
 
-  // 학생(STUDENT)용 사이드바 메뉴
   const studentMenus = [
-    {
-      name: "나의 강의실",
-      path: "/dashboard",
-      icon: <LayoutDashboard size={20} />,
-    },
-    { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
-    { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
-  ];
-  // 4. (중요) 선생님 메뉴 배열 신규 생성!
-  const teacherMenus = [
-    {
-      name: "대시보드",
-      path: "/dashboard",
-      icon: <LayoutDashboard size={20} />,
-    },
+    { name: "나의 강의실", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
     { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
 
-  // 권한에 따라 보여줄 메뉴 결정
+  const teacherMenus = [
+    { name: "대시보드", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+    { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
+    { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
+  ];
+
   const menus =
-    role === "ADMIN"
-      ? adminMenus
-      : role === "TEACHER"
-        ? teacherMenus
-        : studentMenus;
+    role === "ADMIN" ? adminMenus : role === "TEACHER" ? teacherMenus : studentMenus;
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* 1. 좌측 사이드바 영역 */}
-      <aside className="w-64 bg-indigo-900 text-white flex flex-col shadow-xl">
-        <div className="p-6 border-b border-indigo-800">
-          <h1 className="text-2xl font-black tracking-wider">LMS System</h1>
-          <p className="text-indigo-300 text-sm mt-1">
+    <div className="flex h-screen bg-slate-50 font-sans selection:bg-indigo-200">
+      {/* 프리미엄 사이드바: 글래스모피즘 + 짙은 그라데이션 */}
+      <aside className="w-72 bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white flex flex-col border-r border-slate-800/50 shadow-[4px_0_24px_rgba(0,0,0,0.15)] relative z-20">
+        <div className="p-8 border-b border-white/10">
+          <h1 className="text-2xl font-black tracking-tight text-gradient-light mb-1">
+            LMS System
+          </h1>
+          <p className="text-indigo-200/70 text-sm font-medium">
             {role === "ADMIN" ? "원장님 환영합니다" : "학생 환영합니다"}
           </p>
         </div>
 
-        {/* 메뉴 리스트 */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
           {menus.map((menu) => {
             const isActive = location.pathname.includes(menu.path);
             return (
               <Link
                 key={menu.name}
                 to={menu.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl transition-all duration-300 ease-out group ${
                   isActive
-                    ? "bg-indigo-600 text-white font-bold shadow-md"
-                    : "text-indigo-200 hover:bg-indigo-800 hover:text-white"
+                    ? "bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-lg shadow-indigo-500/25 font-semibold"
+                    : "text-indigo-200/80 hover:bg-white/10 hover:text-white hover:shadow-sm"
                 }`}
               >
-                {menu.icon}
-                <span>{menu.name}</span>
+                <div className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+                  {menu.icon}
+                </div>
+                <span className="tracking-wide">{menu.name}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* 하단 로그아웃 버튼 */}
-        <div className="p-4 border-t border-indigo-800">
+        <div className="p-6 border-t border-white/10 backdrop-blur-md">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 text-indigo-200 hover:bg-indigo-800 hover:text-white rounded-xl transition-all"
+            className="flex items-center justify-center gap-3 w-full px-4 py-3.5 text-indigo-200/80 hover:bg-white/10 hover:text-white rounded-2xl transition-all duration-300 group hover:shadow-sm"
           >
-            <LogOut size={20} />
-            <span>로그아웃</span>
+            <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium tracking-wide">로그아웃</span>
           </button>
         </div>
       </aside>
 
-      {/* 2. 우측 메인 콘텐츠 영역 (메뉴를 클릭하면 이 부분만 바뀜) */}
-      <main className="flex-1 overflow-y-auto relative">
+      {/* 메인 콘텐츠 영역 */}
+      <main className="flex-1 overflow-y-auto relative bg-slate-50">
         <Outlet />
       </main>
     </div>
