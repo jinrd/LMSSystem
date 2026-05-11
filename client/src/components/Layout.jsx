@@ -1,6 +1,15 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, BookOpen, CalendarDays, Bell, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  CalendarDays,
+  Bell,
+  LogOut,
+  UserCircle,
+} from "lucide-react";
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -15,21 +24,54 @@ export default function Layout() {
 
   // 관리자(ADMIN)용 사이드바 메뉴
   const adminMenus = [
-    { name: "대시보드", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+    {
+      name: "대시보드",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
     { name: "유저 관리", path: "/admin/users", icon: <Users size={20} /> },
-    { name: "교육과정 관리", path: "/admin/courses", icon: <BookOpen size={20} /> },
-    { name: "전체 스케줄", path: "/admin/schedule", icon: <CalendarDays size={20} /> },
+    {
+      name: "교육과정 관리",
+      path: "/admin/courses",
+      icon: <BookOpen size={20} />,
+    },
+    {
+      name: "전체 스케줄",
+      path: "/admin/schedule",
+      icon: <CalendarDays size={20} />,
+    },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
+    { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
 
   // 학생(STUDENT)용 사이드바 메뉴
   const studentMenus = [
-    { name: "나의 강의실", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+    {
+      name: "나의 강의실",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
+    { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
+  ];
+  // 4. (중요) 선생님 메뉴 배열 신규 생성!
+  const teacherMenus = [
+    {
+      name: "대시보드",
+      path: "/dashboard",
+      icon: <LayoutDashboard size={20} />,
+    },
+    { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
+    { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
 
   // 권한에 따라 보여줄 메뉴 결정
-  const menus = role === "ADMIN" ? adminMenus : studentMenus;
+  const menus =
+    role === "ADMIN"
+      ? adminMenus
+      : role === "TEACHER"
+        ? teacherMenus
+        : studentMenus;
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -41,7 +83,7 @@ export default function Layout() {
             {role === "ADMIN" ? "원장님 환영합니다" : "학생 환영합니다"}
           </p>
         </div>
-        
+
         {/* 메뉴 리스트 */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {menus.map((menu) => {
@@ -51,7 +93,9 @@ export default function Layout() {
                 key={menu.name}
                 to={menu.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive ? "bg-indigo-600 text-white font-bold shadow-md" : "text-indigo-200 hover:bg-indigo-800 hover:text-white"
+                  isActive
+                    ? "bg-indigo-600 text-white font-bold shadow-md"
+                    : "text-indigo-200 hover:bg-indigo-800 hover:text-white"
                 }`}
               >
                 {menu.icon}

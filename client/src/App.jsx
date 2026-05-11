@@ -9,6 +9,7 @@ import NoticeForm from "./pages/common/NoticeForm";
 import AdminSchedule from "./pages/admin/AdminSchedule";
 import Layout from "./components/Layout";
 import DashboardSwitcher from "./pages/common/DashboardSwitcher";
+import MyPage from "./pages/common/MyPage";
 
 /**
  * 1. 관리자 전용 보호 라우트
@@ -98,6 +99,7 @@ function App() {
         {/* [공통] 학생과 관리자 모두 접근 가능 */}
         <Route path="/notices" element={<NoticeList />} />
         <Route path="/notices/:id" element={<NoticeDetail />} />
+        <Route path="/mypage" element={<MyPage />} />
 
         {/* [관리자용] 오직 관리자만 접근 가능 */}
         <Route
