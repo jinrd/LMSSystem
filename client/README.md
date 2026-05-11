@@ -1,16 +1,41 @@
-# React + Vite
+# LmsSystem - Client (프론트엔드)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+이 디렉토리는 미용 학원 관리 시스템(LmsSystem)의 프론트엔드 애플리케이션을 포함하고 있습니다. React와 Vite를 기반으로 구축되었으며, 수강생 및 관리자를 위한 사용자 인터페이스를 제공합니다.
 
-Currently, two official plugins are available:
+## 🛠️ 기술 스택
+- **프레임워크**: React, Vite
+- **스타일링**: Tailwind CSS v4
+- **라우팅**: React Router DOM
+- **HTTP 클라이언트**: Axios
+- **아이콘**: Lucide-react
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📂 주요 폴더 구조
+- `src/api`: 백엔드 API 통신을 위한 Axios 인스턴스 및 설정
+- `src/assets`: 이미지, 아이콘 등 정적 리소스
+- `src/components`: 재사용 가능한 UI 컴포넌트 (모달, 공통 레이아웃 등)
+- `src/pages`: 라우트에 연결된 각 페이지 컴포넌트
+  - `admin`: 관리자 전용 페이지 (회원 관리, 강의 일정, 대시보드 등)
+  - `student`: 수강생 전용 페이지 (학습 대시보드)
+  - `common`: 공통 페이지 (로그인, 회원가입, 공지사항, 마이페이지 등)
+- `src/hooks`: 커스텀 React Hooks
 
-## React Compiler
+## 🚀 시작하기
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 필수 조건
+- Node.js 환경
+- 백엔드(server)가 실행 중이어야 정상적인 API 통신이 가능합니다.
 
-## Expanding the ESLint configuration
+### 설치 및 개발 서버 실행
+```bash
+# 의존성 패키지 설치
+npm install
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# 개발 서버 시작 (기본 포트: 5173)
+npm run dev
+```
+
+### 빌드
+```bash
+# 프로덕션용 빌드 생성
+npm run build
+```

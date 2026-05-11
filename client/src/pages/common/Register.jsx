@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { User, Mail, Lock } from "lucide-react";
 import TermsModal from "../../components/TermsModal";
+import { authAPI } from "../../api";
 
 export default function Register() {
   const navigate = useNavigate();
