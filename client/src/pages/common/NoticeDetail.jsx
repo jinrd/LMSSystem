@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Calendar, Edit, Trash2 } from "lucide-react";
+import { noticeAPI } from "../../api";
 
 export default function NoticeDetail() {
   const { id } = useParams();
@@ -70,7 +71,9 @@ export default function NoticeDetail() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Header Section */}
         <div className="p-8 border-b border-gray-100 bg-gray-50/50">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">{notice.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">
+            {notice.title}
+          </h1>
           <div className="flex items-center text-sm text-gray-500 space-x-4">
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1.5" />
@@ -117,10 +120,6 @@ export default function NoticeDetail() {
             </button>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
       </div>
     </div>
   );
