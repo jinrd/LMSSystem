@@ -14,12 +14,33 @@ router.post("/", verifyToken, isAdmin, classController.createClass);
 router.delete("/:id", verifyToken, isAdmin, classController.deleteClass);
 
 // 4. 특정 강좌의 수강생 목록 조회 (관리자 전용)
-router.get("/:id/enrollments", verifyToken, isAdmin, classController.getEnrollments);
+router.get(
+  "/:id/enrollments",
+  verifyToken,
+  isAdmin,
+  classController.getEnrollments,
+);
 
 // 5. 특정 강좌에 수강생 등록 (관리자 전용)
-router.post("/:id/enrollments", verifyToken, isAdmin, classController.enrollStudent);
+router.post(
+  "/:id/enrollments",
+  verifyToken,
+  isAdmin,
+  classController.enrollStudent,
+);
 
 // 6. 특정 강좌에서 수강생 제거 (관리자 전용)
-router.delete("/:id/enrollments/:studentId", verifyToken, isAdmin, classController.removeStudent);
+router.delete(
+  "/:id/enrollments/:studentId",
+  verifyToken,
+  isAdmin,
+  classController.removeStudent,
+);
+
+// 7. 선생님 대시보드 통계 API (선생님 전용)
+router.get("/teacher/status", verifyToken, classController.getTeacherStatus);
+
+// 8. 선택한 반의 수강생 조회 API(선생님 전용)
+router.get("/teacher/:id/enrollments", verifyToken, classController.getTeacherClassEnrollments);
 
 export default router;

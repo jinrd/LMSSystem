@@ -1,3 +1,4 @@
+import classController from "../controllers/classController";
 import prisma from "../prismaClient";
 import AppError from "../utils/AppError";
 
@@ -18,7 +19,15 @@ const getClassById = async (id: any) => {
 };
 
 const createClass = async (data: any) => {
-  const { name, capacity, startDate, endDate, courseId, instructorId, schedules } = data;
+  const {
+    name,
+    capacity,
+    startDate,
+    endDate,
+    courseId,
+    instructorId,
+    schedules,
+  } = data;
 
   return await prisma.$transaction(async (tx: any) => {
     const createdClass = await tx.class.create({
@@ -97,6 +106,73 @@ const removeStudent = async (classId: any, studentId: any) => {
   });
 };
 
+// 선생님 DashBoard 에서 사용할 함수 조회
+const getTeacherDashboardStatus = async (instructorId: number) => {
+  // 1. 담당중인 반(class) 목록과 각 반의 수강생 수(_count) 조회
+  const classes = await prisma.class.findMany({
+    where: { instructorId },
+    include: {
+      course: { select: { title: true } }, // 부모 과목의 타이틀 가져오기
+      _count: {
+        select: { enrollments: true },
+      },
+    },
+  });
+
+  const totalClasses = classes.length;
+
+  // 2. 총 관리 수강생 수 합산
+  const totalStudents = classes.reduce(
+    (sum: number, cls: any) => sum + cls._count.enrollments,
+    0,
+  );
+
+  // 3. 오늘 예정된 수업 수 계산(0: 일요일 ~ 6: 토요일)
+  const today = new Date().getDay();
+  const todayScedulesData = await prisma.classSchedule.findMany({
+    where: {
+      class: { instructorId },
+      dayOfWeek: today,
+    },
+    include: {
+      class: {
+        select: {
+          name: true,
+          _count: { select: { enrollments: true } }
+        }
+      }
+    },
+    orderBy: { startTime: "asc" } // 시간순 정렬
+  });
+
+  const todaySchedulesList = todayScedulesData.map((sch) => ({
+    id: sch.id,
+    startTime: sch.startTime,
+    endTime: sch.endTime,
+    className: sch.class.name,
+    enrolledCount: sch.class._count.enrollments,
+  }))
+
+  // 4. 담당 강의 상세 정보 배열 가공
+  const classList = classes.map((cls) => ({
+    id: cls.id,
+    name: cls.name,
+    courseTitle: cls.course.title,
+    capacity: cls.capacity,
+    enrolledCount: cls._count.enrollments,
+    startDate: cls.startDate,
+    endDate: cls.endDate,
+  }));
+
+  return {
+    totalClasses,
+    totalStudents,
+    todaySchedules: todayScedulesData.length,
+    todaySchedulesList,
+    classes: classList,
+  };
+};
+
 export default {
   getClassById,
   createClass,
@@ -104,4 +180,5 @@ export default {
   getEnrollments,
   enrollStudent,
   removeStudent,
+  getTeacherDashboardStatus,
 };

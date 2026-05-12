@@ -10,6 +10,7 @@ import AdminSchedule from "./pages/admin/AdminSchedule";
 import Layout from "./components/Layout";
 import DashboardSwitcher from "./pages/common/DashboardSwitcher";
 import MyPage from "./pages/common/MyPage";
+import TeacherClassDetail from "./pages/teacher/TeacherClassDetail";
 
 /**
  * 1. 관리자 전용 보호 라우트
@@ -30,6 +31,23 @@ const AdminRoute = ({ children }) => {
 
   return children;
 };
+
+const TeacherRoute = ({ children }) => {
+  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("lms_token");
+
+  if (!token) {
+    alert("로그인이 필요한 서비스입니다.");
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role !== "TEACHER") {
+    alert("선생님만 접근할 수 있는 페이지입니다.");
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
 
 /**
  * 2. 공통 보호 라우트 (학생 + 관리자)
@@ -142,6 +160,16 @@ function App() {
             </AdminRoute>
           }
         />
+      </Route>
+
+      <Route
+        path="/teacher/classes/:id"
+        element={
+          <TeacherRoute>
+            <TeacherClassDetail />
+          </TeacherRoute>
+        }
+      >
       </Route>
 
       {/* 잘못된 경로 처리 */}
