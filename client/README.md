@@ -15,8 +15,8 @@
 - `src/components`: 재사용 가능한 UI 컴포넌트 (모달, 공통 레이아웃 등)
 - `src/pages`: 라우트에 연결된 각 페이지 컴포넌트
   - `admin`: 관리자 전용 페이지 (회원 관리, 강의 일정, 대시보드 등)
-  - `teacher`: 강사 전용 페이지 (강사 대시보드, 수강생 명단 상세 등)
-  - `student`: 수강생 전용 페이지 (학습 대시보드)
+  - `teacher`: 강사 전용 페이지 (강사 대시보드, `TeacherClassDetail` 등)
+  - `student`: 수강생 전용 페이지 (학습 대시보드, `StudentClassDetail` 등)
   - `common`: 공통 페이지 (로그인, 회원가입, 공지사항, 마이페이지 등)
 - `src/hooks`: 커스텀 React Hooks
 

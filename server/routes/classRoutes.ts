@@ -41,6 +41,12 @@ router.delete(
 router.get("/teacher/status", verifyToken, classController.getTeacherStatus);
 
 // 8. 선택한 반의 수강생 조회 API(선생님 전용)
-router.get("/teacher/:id/enrollments", verifyToken, classController.getTeacherClassEnrollments);
+router.get("/teacher/:id/detail", verifyToken, classController.getTeacherClassDetail);
+
+// 9. 학생용 대시보드 통계 조회
+router.get("/student/status", verifyToken, classController.getStudentStatus);
+
+// 10. 학생용 특정 강의 상세 조회
+router.get("/student/:id/detail", verifyToken, classController.getStudentClassDetail);
 
 export default router;

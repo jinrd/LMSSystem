@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Users, Calendar, LogOut, Clock, Bell } from "lucide-react";
+import { BookOpen, Users, Calendar, Clock, Bell } from "lucide-react";
 export default function TeacherDashboard() {
   const navigate = useNavigate();
-  const [teacherInfo, setTeacherInfo] = useState(() => {
+  const [teacherInfo] = useState(() => {
     const name = localStorage.getItem("userName") || "강사";
     return { name };
   });

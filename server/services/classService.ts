@@ -173,6 +173,139 @@ const getTeacherDashboardStatus = async (instructorId: number) => {
   };
 };
 
+const getStudentDashboardStatus = async (studentId: number) => {
+  // 학생이 수강 등록한 강의 목록 조회
+  const enrollments = await prisma.enrollment.findMany({
+    where: { studentId },
+    include: {
+      class: {
+        include: {
+          course: { select: { title: true } },
+          instructor: { select: { name: true } }
+        }
+      }
+
+    }
+  })
+
+  const totalClasses = enrollments.length;
+
+  // 당일 스케줄 체크
+  const today = new Date().getDay();
+
+  const enrolledClassIds = enrollments.map(e => e.classId);
+
+  const todaySchedulesData = await prisma.classSchedule.findMany({
+    where: {
+      classId: { in: enrolledClassIds },
+      dayOfWeek: today
+    },
+    include: {
+      class: {
+        select: {
+          name: true,
+          instructor: { select: { name: true } }
+        }
+      }
+    },
+    orderBy: { startTime: 'asc' }
+  });
+
+  const todaySchedulesList = todaySchedulesData.map((sch => ({
+    id: sch.id,
+    startTime: sch.startTime,
+    endTime: sch.endTime,
+    className: sch.class.name,
+    instructorName: sch.class.instructor.name,
+  })));
+
+  const classList = enrollments.map(e => ({
+    id: e.class.id,
+    name: e.class.name,
+    courseTitle: e.class.course.title,
+    instructorName: e.class.instructor.name,
+    startDate: e.class.startDate,
+    endDate: e.class.endDate,
+  }))
+
+  return {
+    totalClasses,
+    todaySchedules: todaySchedulesList.length,
+    todaySchedulesList,
+    classes: classList
+  };
+
+}
+
+const getStudentClassDetail = async (classId: number, studentId: number) => {
+  // 학생이 해당 강의를 듣고 있는지 검증 및 조회
+  const enrollment = await prisma.enrollment.findUnique({
+    where: {
+      studentId_classId: {
+        studentId, classId
+      },
+    },
+    include: {
+      class: {
+        include: {
+          course: { select: { title: true, description: true } },
+          instructor: { select: { name: true, email: true } }
+        }
+      }
+    }
+  })
+
+  // 수강하지 않는 강의는 null 반환
+  if (!enrollment) return null;
+
+  return {
+    classInfo: {
+      id: enrollment.class.id,
+      name: enrollment.class.name,
+      startDate: enrollment.class.startDate,
+      endDate: enrollment.class.endDate,
+      courseTitle: enrollment.class.course.title,
+      courseDescription: enrollment.class.course.description,
+      instructorName: enrollment.class.instructor.name,
+      instructorEmail: enrollment.class.instructor.email,
+    },
+    myEnrollment: {
+      status: enrollment.status,
+      createdAt: enrollment.createdAt,
+    },
+  };
+}
+
+const getTeacherClassDetail = async (classId: number, instructorId: number) => {
+  const classData = await prisma.class.findUnique({
+    where: { id: classId, instructorId },
+    include: {
+      course: { select: { title: true, description: true } },
+      instructor: { select: { name: true, email: true } },
+      enrollments: {
+        include: { student: { select: { id: true, name: true, email: true } } },
+        orderBy: { createdAt: "desc" }
+      }
+    }
+  });
+
+  if (!classData) return null;
+
+  return {
+    classInfo: {
+      id: classData.id,
+      name: classData.name,
+      startDate: classData.startDate,
+      endDate: classData.endDate,
+      courseTitle: classData.course.title,
+      courseDescription: classData.course.description,
+      instructorName: classData.instructor.name,
+      instructorEmail: classData.instructor.email,
+    },
+    enrollments: classData.enrollments,
+  };
+}
+
 export default {
   getClassById,
   createClass,
@@ -181,4 +314,7 @@ export default {
   enrollStudent,
   removeStudent,
   getTeacherDashboardStatus,
+  getStudentDashboardStatus,
+  getTeacherClassDetail,
+  getStudentClassDetail,
 };

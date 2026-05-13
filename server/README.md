@@ -17,8 +17,9 @@
 - `utils/`: 비동기 에러 래퍼(catchAsync), 커스텀 에러 클래스 등 유틸리티 함수
 
 ## ✨ 최근 추가된 주요 API 기능
-- **강사(TEACHER) 대시보드 API**: 담당 강의 목록, 수강생 통계, 오늘 스케줄 상세 리스트 제공
-- **강사 전용 수강생 명단 API**: 권한 검증을 통해 본인이 담당하는 클래스의 학생 정보만 안전하게 조회
+- **관심사 분리(Separation of Concerns)**: 비즈니스 로직을 Service 계층으로 이관하고, Controller를 경량화(Thin Controller)하여 유지보수성 향상
+- **대시보드 통계 API**: 강사(TEACHER) 및 수강생(STUDENT) 권한별로 타임라인, 수강생 수, 담당 강의 목록을 계산하여 제공
+- **권한별 상세 조회 API**: `/api/classes/teacher/:id/detail` 및 `/api/classes/student/:id/detail`로 엔드포인트를 분리하여 본인 권한에 맞는 데이터만 안전하게 반환
 
 ## 🚀 시작하기
 

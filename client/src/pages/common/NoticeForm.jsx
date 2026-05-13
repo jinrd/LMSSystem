@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/immutability */
+ 
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, Save, X } from "lucide-react";
@@ -19,7 +19,7 @@ export default function NoticeForm() {
         const data = await noticeAPI.getNoticeById(id);
         setTitle(data.title);
         setContent(data.content);
-      } catch (error) {
+      } catch {
         alert("데이터를 불러오지 못했습니다.");
         navigate("/notices");
       }

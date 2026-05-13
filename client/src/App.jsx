@@ -11,6 +11,7 @@ import Layout from "./components/Layout";
 import DashboardSwitcher from "./pages/common/DashboardSwitcher";
 import MyPage from "./pages/common/MyPage";
 import TeacherClassDetail from "./pages/teacher/TeacherClassDetail";
+import StudentClassDetail from "./pages/student/StudentClassDetail";
 
 /**
  * 1. 관리자 전용 보호 라우트
@@ -111,6 +112,10 @@ function App() {
           </PrivateRoute>
         }
       >
+        <Route
+          path="/student/classes/:id"
+          element={<StudentClassDetail />}
+        />
         {/* 공통 메인 페이지 (권한에 따라 Admin/Student 대시보드로 자동 분기) */}
         <Route path="/dashboard" element={<DashboardSwitcher />} />
 
@@ -169,8 +174,8 @@ function App() {
             <TeacherClassDetail />
           </TeacherRoute>
         }
-      >
-      </Route>
+      />
+
 
       {/* 잘못된 경로 처리 */}
       <Route path="*" element={<Navigate to="/login" replace />} />

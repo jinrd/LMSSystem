@@ -97,29 +97,40 @@ const getTeacherStatus = catchAsync(async (req: any, res: Response) => {
   res.json(status);
 });
 
-const getTeacherClassEnrollments = catchAsync(async (req: any, res: Response) => {
-  const classId = parseInt(req.params.id as string);
+const getTeacherClassDetail = catchAsync(async (req: any, res: Response) => {
+  const classId = parseInt(req.params.id);
   const instructorId = req.user.userId;
 
-  // 해당 강의 정보 조회(classService 의 기본 함수 재사용)
-  const classData = await classService.getClassById(classId);
+  const detail = await classService.getTeacherClassDetail(classId, instructorId);
 
-  if (!classData) {
-    throw new AppError("존재하지 않는 강의입니다.", 404);
+  if (!detail) {
+    throw new AppError("본인이 담당하는 강좌가 아니거나 강좌를 찾을 수 없습니다.", 403);
   }
 
-  // 본인이 담당하는 강의인지 권한체크
-  if (classData.instructorId !== instructorId) {
-    throw new AppError("자신이 담당하는 강의만 조회할 수 있습니다.", 403);
+  res.json(detail);
+});
+
+const getStudentStatus = catchAsync(async (req: any, res: Response) => {
+  const studentId = req.user.userId;
+  if (!studentId) {
+    throw new AppError("인증 정보가 없습니다.", 401);
   }
 
-  // 해당 강의 수강생 목록 조회
-  const enrollments = await classService.getEnrollments(classId);
+  const status = await classService.getStudentDashboardStatus(studentId);
+  res.json(status);
+});
 
-  res.json({
-    classInfo: classData,
-    enrollments,
-  });
+const getStudentClassDetail = catchAsync(async (req: any, res: Response) => {
+  const classId = parseInt(req.params.id);
+  const studentId = req.user.userId;
+
+  const detail = await classService.getStudentClassDetail(classId, studentId);
+
+  if (!detail) {
+    throw new AppError("수강 중인 강의가 아니거나 권한이 없습니다.", 403);
+  }
+
+  res.json(detail);
 })
 
 export default {
@@ -130,5 +141,7 @@ export default {
   enrollStudent,
   removeStudent,
   getTeacherStatus,
-  getTeacherClassEnrollments
+  getTeacherClassDetail,
+  getStudentStatus,
+  getStudentClassDetail
 };
