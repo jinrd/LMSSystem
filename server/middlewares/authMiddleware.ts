@@ -36,6 +36,15 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (req.user && req.user.role === "ADMIN") {
     next();
   } else {
-    next(new AppError("관리자 권한이 필요합니다.", 403));
+    next(new AppError("원장님 권한이 필요합니다.", 403));
+  }
+};
+
+export const isTeacher = (req: Request, res: Response, next: NextFunction) => {
+  // verifyToken이 먼저 실행되어 req.user가 설정되어 있어야 함
+  if (req.user && (req.user.role === "TEACHER" || req.user.role === "ADMIN")) {
+    next();
+  } else {
+    next(new AppError("선생님 권한이 필요합니다.", 403));
   }
 };

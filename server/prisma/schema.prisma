@@ -19,8 +19,10 @@ model User {
   createdAt DateTime @default(now())
 
   // 강좌, 강의를 위해 추가
-  teachingClasses     Class[]     // 강사일 경우 담당하는 반들
+  teachingClasses     Class[]         // 강사일 경우 담당하는 반들
   enrollments         Enrollment[]    // 학생일 경우 수강하는 반들
+
+  submissions         Submission[]    // 학생일 경우 제출한 과제들
 
 
   // 이메일 검색 속도 향상을 위한 인덱싱
@@ -69,6 +71,7 @@ model Class {
   // 이 반의 세부 시간표, 수강생, 과제들
   schedules     ClassSchedule[]
   enrollments   Enrollment[]
+  assignments   Assignment[]
   
 }
 
@@ -113,4 +116,44 @@ model Notice {
   authorId    Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// 선생님이 출제한 과제
+model Assignment {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime
+
+  classId     Int
+  class       Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  // 이 과제에 제출된 결과물들 (양방향 관계)
+  submissions Submission[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 학생들이 제출한 과제 결과물
+model Submission {
+  id           Int        @id @default(autoincrement())
+  content      String?    // 내용만 있거나
+  fileUrl      String?    // 첨부파일만 있을 수도 있음
+  
+  assignmentId Int
+  assignment   Assignment @relation(fields:[assignmentId], references:[id], onDelete: Cascade)
+
+  studentId    Int
+  student      User       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  
+  status       String     @default("SUBMITTED")   // 제출 상태
+  score        Int?       // 채점 점수 (선택)
+  feedback     String?    // 선생님 피드백 (선택)
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  
+  // 한 학생은 하나의 과제에 대해 하나의 제출물만 가짐 (중복 제출 방지)
+  @@unique([assignmentId, studentId])
 }

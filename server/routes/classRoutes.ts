@@ -1,5 +1,5 @@
 import express from "express";
-import { verifyToken, isAdmin } from "../middlewares/authMiddleware";
+import { verifyToken, isAdmin, isTeacher } from "../middlewares/authMiddleware";
 import classController from "../controllers/classController";
 
 const router = express.Router();
@@ -38,10 +38,10 @@ router.delete(
 );
 
 // 7. 선생님 대시보드 통계 API (선생님 전용)
-router.get("/teacher/status", verifyToken, classController.getTeacherStatus);
+router.get("/teacher/status", verifyToken, isTeacher, classController.getTeacherStatus);
 
 // 8. 선택한 반의 수강생 조회 API(선생님 전용)
-router.get("/teacher/:id/detail", verifyToken, classController.getTeacherClassDetail);
+router.get("/teacher/:id/detail", verifyToken, isTeacher, classController.getTeacherClassDetail);
 
 // 9. 학생용 대시보드 통계 조회
 router.get("/student/status", verifyToken, classController.getStudentStatus);

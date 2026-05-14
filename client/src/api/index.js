@@ -67,3 +67,43 @@ export const userAPI = {
     return response.data;
   },
 };
+
+export const assignmentAPI = {
+  // 1. 특정 강의의 과제 목록 조회 (GET)
+  getAssignments: async (classId) => {
+    const response = await axiosInstance.get(`/assignments/class/${classId}`);
+    return response.data;
+  },
+
+  // 2. 과제 출제 (선생님 전용, POST)
+  createAssignment: async (classId, data) => {
+    const response = await axiosInstance.post(`/assignments/class/${classId}`, data);
+    return response.data;
+  },
+
+  // 3. 제출물 목록 조회 (선생님 전용, GET)
+  getSubmissions: async (assignmentId) => {
+    const response = await axiosInstance.get(`/assignments/${assignmentId}/submissions`);
+    return response.data;
+  },
+
+  // 4. 과제 채점 (선생님 전용, PUT)
+  gradeSubmission: async (submissionId, data) => {
+    const response = await axiosInstance.put(`/assignments/submissions/${submissionId}/grade`, data);
+    return response.data;
+  },
+
+  // 5. 과제 제출 (학생 전용, POST - ★ 파일 업로드 핵심 ★)
+  submitAssignment: async (assignmentId, formData) => {
+    const response = await axiosInstance.post(
+      `/assignments/${assignmentId}/submit`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data;
+  },
+};
