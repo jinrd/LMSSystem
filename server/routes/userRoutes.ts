@@ -19,4 +19,10 @@ router.put("/me/password", verifyToken, userController.updateMyPassword);
 // [API] 회원 역할 변경 (관리자 권한)
 router.put("/:id/role", verifyToken, isAdmin, userController.updateUserRole);
 
+// 마이페이지에서 본인 탈퇴 요청
+router.delete("/me", verifyToken, userController.deleteMe);
+
+// 관리자 특정 유저 삭제
+router.delete("/:id", verifyToken, isAdmin, userController.deleteUser);
+
 export default router;

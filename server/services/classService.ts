@@ -276,9 +276,9 @@ const getStudentClassDetail = async (classId: number, studentId: number) => {
   };
 }
 
-const getTeacherClassDetail = async (classId: number, instructorId: number) => {
+const getTeacherClassDetail = async (classId: number, instructorId: number, role?: string) => {
   const classData = await prisma.class.findUnique({
-    where: { id: classId, instructorId },
+    where: role === "ADMIN" ? { id: classId } : { id: classId, instructorId },
     include: {
       course: { select: { title: true, description: true } },
       instructor: { select: { name: true, email: true } },

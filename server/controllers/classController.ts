@@ -100,8 +100,9 @@ const getTeacherStatus = catchAsync(async (req: any, res: Response) => {
 const getTeacherClassDetail = catchAsync(async (req: any, res: Response) => {
   const classId = parseInt(req.params.id);
   const instructorId = req.user.userId;
+  const role = req.user.role;
 
-  const detail = await classService.getTeacherClassDetail(classId, instructorId);
+  const detail = await classService.getTeacherClassDetail(classId, instructorId, role);
 
   if (!detail) {
     throw new AppError("본인이 담당하는 강좌가 아니거나 강좌를 찾을 수 없습니다.", 403);

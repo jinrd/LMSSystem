@@ -50,10 +50,27 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
   res.json(updatedUser);
 });
 
+const deleteMe = catchAsync(async (req: any, res: Response) => {
+  const userId = parseInt(req.user.userId);
+  
+  await userService.deleteUser(userId);
+
+  res.json({ message: "회원 탈퇴 처리가 완료되었습니다." })
+})
+
+const deleteUser = catchAsync(async (req: any, res: Response) => {
+  const userId = parseInt(req.params.id);
+  await userService.deleteUser(userId);
+  res.json({ message: "사용자가 삭제되었습니다." })
+})
+
+
 export default {
   getUsers,
   getMe,
   updateMe,
   updateMyPassword,
   updateUserRole,
+  deleteMe,
+  deleteUser
 };

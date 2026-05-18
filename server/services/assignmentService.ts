@@ -2,7 +2,7 @@ import prisma from "../prismaClient";
 import AppError from "../utils/AppError";
 
 // 과제 출제
-const createAssignment = async (classId: any, instructorId: any, data: any) => {
+const createAssignment = async (classId: any, instructorId: any, data: any, role?: string) => {
     const { title, description, dueDate } = data;
 
     const selectClass = await prisma.class.findUnique({ where: { id: classId } })
@@ -11,7 +11,7 @@ const createAssignment = async (classId: any, instructorId: any, data: any) => {
         throw new AppError("선택하신 강의를 찾을 수 없습니다.", 404)
     }
 
-    if (selectClass.instructorId !== instructorId) {
+    if (role !== "ADMIN" && selectClass.instructorId !== instructorId) {
         throw new AppError("본인이 담당하는 반에만 과제를 출제할 수 있습니다.", 403)
     }
 
@@ -95,17 +95,17 @@ const submitAssignment = async (assignmentId: any, studentId: any, content: any,
 }
 
 // 특정 과제의 학생 제출 목록 조회
-const getSubmissions = async (assignmentId: any, instructorId: any) => {
+const getSubmissions = async (assignmentId: any, instructorId: any, role?: string) => {
     const assignment = await prisma.assignment.findUnique({
         where: { id: assignmentId },
         include: { class: true }
     })
 
     if (!assignment) {
-        throw new AppError("과제를 찾을 수 없습니다.", 404);
+         throw new AppError("과제를 찾을 수 없습니다.", 404);
     }
 
-    if (assignment.class.instructorId !== instructorId) {
+    if (role !== "ADMIN" && assignment.class.instructorId !== instructorId) {
         throw new AppError("담당한 과목이 아닙니다.", 403);
     }
 
@@ -126,7 +126,7 @@ const getSubmissions = async (assignmentId: any, instructorId: any) => {
 }
 
 // 과제 채점
-const gradeSubmission = async (submissionId: any, instructorId: any, score: any, feedback: any) => {
+const gradeSubmission = async (submissionId: any, instructorId: any, score: any, feedback: any, role?: string) => {
     // 1. 제출물과 해당 과제의 담당 강사 정보 조회
     const submission = await prisma.submission.findUnique({
         where: { id: submissionId },
@@ -141,8 +141,8 @@ const gradeSubmission = async (submissionId: any, instructorId: any, score: any,
         throw new AppError("제출된 과제를 찾을 수 없습니다.", 404);
     }
 
-    // 2. 권한 검증: 이 제출물이 속한 반의 강사가 요청한 사람이 맞는지 확인
-    if (submission.assignment.class.instructorId !== instructorId) {
+    // 2. 권한 검증: 이 제출물이 속한 반의 강사가 요청한 사람이 맞는지 확인 (ADMIN은 예외)
+    if (role !== "ADMIN" && submission.assignment.class.instructorId !== instructorId) {
         throw new AppError("해당 과제를 채점할 권한이 없습니다.", 403);
     }
 
@@ -158,7 +158,6 @@ const gradeSubmission = async (submissionId: any, instructorId: any, score: any,
 
     return gradedSubmission;
 };
-
 export default {
     createAssignment,
     getAssignmentsByClass,

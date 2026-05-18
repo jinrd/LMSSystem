@@ -30,7 +30,7 @@ const getMe = async (userId: any) => {
       createdAt: true,
     },
   });
-  
+
   if (!user) {
     throw new AppError("사용자를 찾을 수 없습니다.", 401);
   }
@@ -82,10 +82,17 @@ const updateUserRole = async (userId: any, role: any) => {
   });
 };
 
+const deleteUser = async (userId: any) => {
+  return await prisma.user.delete({
+    where: { id: userId }
+  })
+}
+
 export default {
   getUsers,
   getMe,
   updateMe,
   updateMyPassword,
   updateUserRole,
+  deleteUser
 };

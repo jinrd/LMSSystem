@@ -8,6 +8,7 @@ import {
   Calendar,
   User as UserIcon,
   Search,
+  Trash2,
 } from "lucide-react";
 import { userAPI } from "../../api";
 
@@ -103,6 +104,37 @@ export default function UserList() {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm("이 유저를 정말로 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.")) {
+      return;
+    }
+
+    const token = localStorage.getItem("lms_token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/users/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "사용자 삭제에 실패했습니다.");
+      }
+
+      // 성공 시 화면에서 해당 유저 제거
+      setUsers(users.filter((user) => user.id !== userId));
+      alert("사용자가 성공적으로 삭제되었습니다.");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   // 검색어에 맞게 유저 필터링 기능
   const filteredUsers = users.filter(
     (user) => user.name.includes(searchTerm) || user.email.includes(searchTerm),
@@ -169,13 +201,16 @@ export default function UserList() {
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       가입일
                     </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">
+                      관리
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {filteredUsers.length === 0 ? (
                     <tr>
                       <td
-                        colSpan="4"
+                        colSpan="5"
                         className="px-6 py-12 text-center text-slate-500"
                       >
                         가입된 회원이 없습니다.
@@ -228,6 +263,15 @@ export default function UserList() {
                               },
                             )}
                           </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            title="삭제"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
                         </td>
                       </tr>
                     ))

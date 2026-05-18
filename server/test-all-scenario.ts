@@ -224,6 +224,10 @@ async function runAllTests() {
     const tDetailRes = await fetch(`${API_BASE}/classes/teacher/${classId}/detail`, { headers: { "Authorization": `Bearer ${teacherToken}` } });
     if (!tDetailRes.ok) throw new Error("선생님용 강좌 상세 조회 실패");
 
+    // [ADMIN Bypass 검증] 원장님도 선생님 상세에 접근 가능한지 테스트
+    const adminTDetailRes = await fetch(`${API_BASE}/classes/teacher/${classId}/detail`, { headers: { "Authorization": `Bearer ${adminToken}` } });
+    if (!adminTDetailRes.ok) throw new Error("원장님 권한으로 선생님 강좌 상세 조회 우회 실패");
+
     const sStatusRes = await fetch(`${API_BASE}/classes/student/status`, { headers: { "Authorization": `Bearer ${studentToken}` } });
     if (!sStatusRes.ok) throw new Error("학생 통계 조회 실패");
 
@@ -254,6 +258,14 @@ async function runAllTests() {
       method: "DELETE", headers: { "Authorization": `Bearer ${adminToken}` }
     });
     if (!rmNoticeRes.ok) throw new Error("공지 삭제 실패");
+    
+    // 유저 삭제 (DB 직접 접근)
+    await prisma.user.deleteMany({
+      where: {
+        id: { in: [adminId, teacherId, studentId] }
+      }
+    });
+
     console.log("✅ 삭제 기능 확인 완료");
 
     console.log("\n🎉 [모든 테스트 성공] 등록된 모든 API 엔드포인트가 정상적으로 작동합니다!");

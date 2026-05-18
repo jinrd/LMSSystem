@@ -121,6 +121,8 @@ export default function AdminSchedule() {
             allDaySlot={false} // 종일 일정 칸 숨기기
             height="800px"
             locale="ko" // 한국어 설정
+            slotEventOverlap={false} // 동일 시간대 일정 겹침 방지 (나란히 표시)
+            dayMaxEvents={true} // 월간 뷰에서 일정 개수가 많을 경우 +more 로 표시
           />
         )}
       </div>

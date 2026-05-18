@@ -63,7 +63,7 @@ model Class {
 
   // 강좌를 담당하는 강사는 누구인지 (User 테이블과 연결)
   instructorId    Int
-  instructor      User     @relation(fields: [instructorId], references: [id])
+  instructor      User     @relation(fields: [instructorId], references: [id], onDelete: Cascade)
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime  @updatedAt
@@ -97,7 +97,7 @@ model Enrollment {
   status    String    @default("ENROLLED")    // ENROLLED, COMPLETED, CANCELLED 등
 
   studentId     Int
-  student       User    @relation(fields: [studentId], references: [id])
+  student       User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   classId       Int
   class         Class   @relation(fields: [classId], references: [id], onDelete: Cascade)

@@ -42,8 +42,8 @@ const TeacherRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role !== "TEACHER") {
-    alert("선생님만 접근할 수 있는 페이지입니다.");
+  if (role !== "TEACHER" && role !== "ADMIN") {
+    alert("선생님 권한이 필요한 페이지입니다.");
     return <Navigate to="/dashboard" replace />;
   }
 

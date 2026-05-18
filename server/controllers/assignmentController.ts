@@ -7,13 +7,14 @@ import assignmentService from "../services/assignmentService";
 const createAssignment = catchAsync(async (req: any, res: Response) => {
     const classId = parseInt(req.params.classId as string);
     const instructorId = req.user.userId;
+    const role = req.user.role;
     const { title, description, dueDate } = req.body;
 
     if (!title || !description || !dueDate) {
         throw new AppError("과제 제목, 내용, 마감일을 모두 입력해주세요.", 400);
     }
 
-    const assignment = await assignmentService.createAssignment(classId, instructorId, req.body);
+    const assignment = await assignmentService.createAssignment(classId, instructorId, req.body, role);
 
     res.status(201).json({ message: "과제가 성공적으로 출제되었습니다.", assignment });
 });
@@ -49,8 +50,9 @@ const submitAssignment = catchAsync(async (req: any, res: Response) => {
 const getSubmissions = catchAsync(async (req: any, res: Response) => {
     const assignmentId = parseInt(req.params.assignmentId as string);
     const instructorId = req.user.userId;
+    const role = req.user.role;
 
-    const submissions = await assignmentService.getSubmissions(assignmentId, instructorId);
+    const submissions = await assignmentService.getSubmissions(assignmentId, instructorId, role);
 
     res.json(submissions);
 });
@@ -59,13 +61,14 @@ const getSubmissions = catchAsync(async (req: any, res: Response) => {
 const gradeSubmission = catchAsync(async (req: any, res: Response) => {
     const submissionId = parseInt(req.params.submissionId as string);
     const instructorId = req.user.userId;
+    const role = req.user.role;
     const { score, feedback } = req.body;
 
     if (score === undefined || score === null) {
         throw new AppError("점수를 입력해주세요.", 400);
     }
 
-    const gradedSubmission = await assignmentService.gradeSubmission(submissionId, instructorId, score, feedback);
+    const gradedSubmission = await assignmentService.gradeSubmission(submissionId, instructorId, score, feedback, role);
 
     res.json({ message: "채점이 완료되었습니다.", gradedSubmission });
 });
