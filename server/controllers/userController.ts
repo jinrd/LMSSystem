@@ -52,7 +52,7 @@ const updateUserRole = catchAsync(async (req: Request, res: Response) => {
 
 const deleteMe = catchAsync(async (req: any, res: Response) => {
   const userId = parseInt(req.user.userId);
-  
+
   await userService.deleteUser(userId);
 
   res.json({ message: "회원 탈퇴 처리가 완료되었습니다." })
@@ -64,6 +64,27 @@ const deleteUser = catchAsync(async (req: any, res: Response) => {
   res.json({ message: "사용자가 삭제되었습니다." })
 })
 
+const updateUserStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  if (!id || isNaN(Number(id))) {
+    throw new AppError("유효하지 않은 사용자 ID입니다.", 400);
+  }
+
+  if (!status) {
+    throw new AppError("변경할 상태(status) 값이 필요합니다.", 400);
+  }
+
+  // 서비스 함수 호출
+  const updatedUser = await userService.updateUserStatus(Number(id), status);
+  res.json({
+    message: status === "ON_LEAVE"
+      ? "휴학 처리가 완료되었으며 수강 목록에서 제외되었습니다."
+      : "재학(복학) 처리가 완료되었습니다.",
+    user: updatedUser
+  });
+})
 
 export default {
   getUsers,
@@ -72,5 +93,6 @@ export default {
   updateMyPassword,
   updateUserRole,
   deleteMe,
-  deleteUser
+  deleteUser,
+  updateUserStatus
 };

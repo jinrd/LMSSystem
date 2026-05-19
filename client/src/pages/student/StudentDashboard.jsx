@@ -9,6 +9,8 @@ export default function StudentDashboard() {
     return { name };
   });
 
+  const [userStatus, setUserStatus] = useState("ACTIVE");
+
   const [stats, setStats] = useState({
     totalClasses: 0,
     todaySchedules: 0,
@@ -19,6 +21,24 @@ export default function StudentDashboard() {
   const [notices, setNotices] = useState([]);
 
   useEffect(() => {
+    // 0. 내 상태(휴학 여부) 먼저 확인하기
+    const fetchMyStatus = async () => {
+      try {
+        const token = localStorage.getItem("lms_token");
+        const res = await fetch("http://localhost:5001/api/users/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUserStatus(data.status || "ACTIVE");
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchMyStatus();
+
     // 1. 학원 최근 공지사항 불러오기
     const fetchNotices = async () => {
       try {
@@ -56,6 +76,32 @@ export default function StudentDashboard() {
     fetchStatus();
     fetchNotices();
   }, []);
+
+  // 휴학 중일 경우 대시보드 화면 자체를 덮어버림
+  if (userStatus === "ON_LEAVE") {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-8 animate-fade-in-up">
+         <div className="bg-white p-10 rounded-3xl shadow-lg border border-slate-100 text-center max-w-md w-full">
+           <div className="w-20 h-20 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+              <User className="w-10 h-10" />
+           </div>
+           <h2 className="text-2xl font-black text-slate-800 mb-4 tracking-tight">현재 휴학 상태입니다</h2>
+           <p className="text-slate-500 mb-8 font-medium leading-relaxed">
+              수강 내역 조회 및 시간표 접근이 일시적으로 제한되었습니다.<br />
+              다시 수업에 참여하시려면 학원 데스크로 문의해 주세요.
+           </p>
+           <button onClick={() => {
+              localStorage.removeItem("lms_token");
+              localStorage.removeItem("role");
+              localStorage.removeItem("userName");
+              navigate("/");
+           }} className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 transition-colors">
+              안전하게 로그아웃
+           </button>
+         </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-8 animate-fade-in-up">

@@ -25,6 +25,10 @@ export default function Login() {
       localStorage.setItem("lms_token", data.token);
       localStorage.setItem("role", data.role);
       
+      if (data.status === "ON_LEAVE") {
+        alert("현재 휴학 상태입니다. 대시보드 및 수강 접근이 제한됩니다.");
+      }
+
       if (data.role === "ADMIN") {
         navigate("/users");
       } else {

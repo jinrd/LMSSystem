@@ -135,6 +135,46 @@ export default function UserList() {
     }
   };
 
+  const handleStatusChange = async (userId, currentRole, newStatus) => {
+    if (currentRole !== "STUDENT") {
+      alert("학생 계정만 휴학 처리가 가능합니다.");
+      return;
+    }
+
+    if (newStatus === "ON_LEAVE") {
+      if (!window.confirm("휴학 처리 시 이 학생이 수강 중이던 모든 강의에서 제외되어 정원이 비워집니다.\n정말로 진행하시겠습니까?")) return;
+    } else {
+      if (!window.confirm("다시 재학(복학) 처리하시겠습니까?")) return;
+    }
+
+    try {
+      const token = localStorage.getItem("lms_token");
+      const res = await fetch(`http://localhost:5001/api/users/${userId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        alert(data.message);
+        setUsers(
+          users.map((user) =>
+            user.id === userId ? { ...user, status: newStatus } : user,
+          ),
+        );
+      } else {
+        const errorData = await res.json();
+        alert(errorData.message || "상태 변경 실패");
+      }
+    } catch (error) {
+      console.error("Status update error", error);
+    }
+  };
+
   // 검색어에 맞게 유저 필터링 기능
   const filteredUsers = users.filter(
     (user) => user.name.includes(searchTerm) || user.email.includes(searchTerm),
@@ -199,6 +239,9 @@ export default function UserList() {
                       직급
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      상태
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       가입일
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">
@@ -250,6 +293,24 @@ export default function UserList() {
                             <option value="TEACHER">{roleMap.TEACHER}</option>
                             <option value="STUDENT">{roleMap.STUDENT}</option>
                           </select>
+                        </td>
+                        <td className="px-6 py-4">
+                          {user.role === "STUDENT" ? (
+                            <select
+                              value={user.status || "ACTIVE"}
+                              onChange={(e) => handleStatusChange(user.id, user.role, e.target.value)}
+                              className={`border text-sm rounded-lg focus:ring-blue-500 block w-full p-2 outline-none cursor-pointer font-bold ${
+                                user.status === "ON_LEAVE"
+                                  ? "bg-orange-50 border-orange-200 text-orange-600"
+                                  : "bg-blue-50 border-blue-200 text-blue-600"
+                              }`}
+                            >
+                              <option value="ACTIVE">재학</option>
+                              <option value="ON_LEAVE">휴학</option>
+                            </select>
+                          ) : (
+                            <span className="text-slate-400 text-sm px-2 font-medium">해당 없음</span>
+                          )}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-slate-600">

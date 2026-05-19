@@ -1,6 +1,7 @@
 import express from "express";
-import { verifyToken, isAdmin } from "../middlewares/authMiddleware";
+import { verifyToken, isAdmin, isTeacher } from "../middlewares/authMiddleware";
 import userController from "../controllers/userController";
+
 
 const router = express.Router();
 
@@ -24,5 +25,9 @@ router.delete("/me", verifyToken, userController.deleteMe);
 
 // 관리자 특정 유저 삭제
 router.delete("/:id", verifyToken, isAdmin, userController.deleteUser);
+
+// 학생 상태 변경
+router.put("/:id/status", verifyToken, isAdmin, userController.updateUserStatus)
+
 
 export default router;

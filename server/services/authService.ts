@@ -45,22 +45,64 @@ const loginUser = async (credentials: any) => {
     throw new AppError("이메일 또는 비밀번호가 올바르지 않습니다.", 401);
   }
 
+  // 계정 잠금 상태 확인
+  if (user.lockedUntil && user.lockedUntil > new Date()) {
+    // 잠금 남은 시간 계산
+    const remainingMinutes = Math.ceil((user.lockedUntil.getTime() - new Date().getTime()) / 60000);
+    throw new AppError(`계정이 잠겼습니다. ${remainingMinutes}분 뒤에 다시 시도해주세요.`, 403);
+  }
+
   // 비밀번호 검증
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    throw new AppError("이메일 또는 비밀번호가 올바르지 않습니다.", 401);
+    const newAttempts = user.failedLoginAttempts + 1;
+
+    let lockUntil = null;
+
+    if (newAttempts >= 5) {
+      lockUntil = new Date(Date.now() + 15 * 60 * 1000); // 현재 시간 + 15분
+    }
+
+    // db 업데이트
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginAttempts: newAttempts,
+        lockedUntil: lockUntil
+      }
+    })
+
+    if (newAttempts >= 5) {
+      throw new AppError("비밀번호를 5회 연속 틀려 계정이 15분간 잠깁니다.", 403);
+    } else {
+      throw new AppError("이메일 또는 비밀번호가 올바르지 않습니다.", 401);
+    }
   }
 
-  // JWT 토큰 발급 (1일 유효)
+  // 5. 로그인 성공 시: 기존에 실패 횟수가 있었다면 0으로 초기화
+  if (user.failedLoginAttempts > 0) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+      },
+    });
+  }
+
+
+  // JWT 토큰 발급 (학생은 12시간, 그 외 관리자/강사는 1일 유효)
+  const tokenExpiresIn = user.role === "STUDENT" ? "12h" : "1d";
   const token = jwt.sign(
     { userId: user.id, role: user.role },
     JWT_SECRET,
-    { expiresIn: "1d" },
+    { expiresIn: tokenExpiresIn },
   );
 
   return {
     token,
     role: user.role,
+    status: user.status
   };
 };
 

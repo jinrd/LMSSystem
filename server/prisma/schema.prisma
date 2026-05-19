@@ -24,6 +24,12 @@ model User {
 
   submissions         Submission[]    // 학생일 경우 제출한 과제들
 
+  // 비밀번호 횟수 제한
+  failedLoginAttempts     Int     @default(0)
+  lockedUntil             DateTime?
+
+  // 휴학/재학 상태 관리 필드
+  status              String      @default("ACTIVE")
 
   // 이메일 검색 속도 향상을 위한 인덱싱
   @@index([email])
