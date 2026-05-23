@@ -10,6 +10,7 @@ const getUsers = async (role: any) => {
       id: true,
       email: true,
       name: true,
+      phone: true,
       role: true,
       status: true,
       createdAt: true,
@@ -27,6 +28,7 @@ const getMe = async (userId: any) => {
       id: true,
       email: true,
       name: true,
+      phone: true,
       role: true,
       status: true,
       createdAt: true,
@@ -39,11 +41,11 @@ const getMe = async (userId: any) => {
   return user;
 };
 
-const updateMe = async (userId: any, name: any) => {
+const updateMe = async (userId: any, name: any, phone: any) => {
   return await prisma.user.update({
     where: { id: userId },
-    data: { name },
-    select: { id: true, email: true, name: true, role: true },
+    data: { name, phone },
+    select: { id: true, email: true, name: true, phone: true, role: true },
   });
 };
 

@@ -14,6 +14,7 @@ model User {
   email     String   @unique
   password  String
   name      String
+  phone     String?
   role      Role  @default(STUDENT)
   termsAgreed Boolean
   createdAt DateTime @default(now())
@@ -30,6 +31,9 @@ model User {
 
   // 휴학/재학 상태 관리 필드
   status              String      @default("ACTIVE")
+
+  resetPasswordToken    String?       // 비밀번호 재설정용 고유 토큰값(예 : UUID 또는 랜덤 문자열)
+  resetPasswordExpires  DateTime?     // 비밀번호 재설정용 토큰 만료 시간(보통 생성 후 1시간)
 
   // 이메일 검색 속도 향상을 위한 인덱싱
   @@index([email])

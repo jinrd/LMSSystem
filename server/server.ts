@@ -8,6 +8,7 @@ import path from "path";
 dotenv.config();
 
 // 분리된 라우트 모듈 가져오기
+import dashboardRoutes from "./routes/dashboardRoutes";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import termsRoutes from "./routes/termsRoutes";
@@ -41,6 +42,7 @@ app.use(express.json()); // JSON 바디 파싱
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // 업로드된 정적 파일 제공
 
 // API 라우트 연결 (URL 모듈화)
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/terms", termsRoutes);

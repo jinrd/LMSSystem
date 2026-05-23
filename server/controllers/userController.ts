@@ -15,12 +15,12 @@ const getMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateMe = catchAsync(async (req: Request, res: Response) => {
-  const { name } = req.body;
+  const { name, phone } = req.body;
   if (!name || name.trim() === "") {
     throw new AppError("이름을 입력해주세요.", 400);
   }
 
-  const updatedUser = await userService.updateMe(req.user.userId, name);
+  const updatedUser = await userService.updateMe(req.user.userId, name, phone);
   res.json({
     message: "정보가 성공적으로 수정되었습니다.",
     user: updatedUser,

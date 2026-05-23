@@ -108,6 +108,16 @@ export default function Login() {
             {isLoading ? "접속 중..." : "로그인"}
           </button>
         </form>
+        
+        <div className="mt-6 text-right">
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-slate-500 hover:text-blue-600 transition-colors"
+          >
+            비밀번호를 잊으셨나요?
+          </Link>
+        </div>
+
         <div className="mt-8 text-center text-sm text-slate-500 font-medium">
           계정이 없으신가요?{" "}
           <Link

@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/common/Login";
 import Register from "./pages/common/Register";
+import ForgotPassword from "./pages/common/ForgotPassword";
+import ResetPassword from "./pages/common/ResetPassword";
 import UserList from "./pages/admin/UserList";
 import AdminCourseManagement from "./pages/admin/AdminCourseManagement";
 import NoticeList from "./pages/common/NoticeList";
@@ -100,6 +102,22 @@ function App() {
         element={
           <PublicRoute>
             <Register />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <PublicRoute>
+            <ResetPassword />
           </PublicRoute>
         }
       />

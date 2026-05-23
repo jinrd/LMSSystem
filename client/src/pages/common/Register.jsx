@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Lock, Phone } from "lucide-react";
 import TermsModal from "../../components/TermsModal";
 import { authAPI } from "../../api";
+import { formatPhoneNumber } from "../../utils/format";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Register() {
     email: "",
     password: "",
     name: "",
+    phone: "",
     termsAgreed: false,
   });
   const [errorMsg, setErrorMsg] = useState("");
@@ -27,9 +29,15 @@ export default function Register() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
+    let finalValue = type === "checkbox" ? checked : value;
+    
+    if (name === "phone") {
+      finalValue = formatPhoneNumber(value);
+    }
+
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: finalValue,
     }));
   };
 
@@ -164,6 +172,24 @@ export default function Register() {
                 required
                 className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700"
                 placeholder="••••••••"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+              전화번호 (선택)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                <Phone className="h-5 w-5 text-slate-400" />
+              </div>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700"
+                placeholder="010-1234-5678"
               />
             </div>
           </div>

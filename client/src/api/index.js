@@ -10,6 +10,14 @@ export const authAPI = {
     const response = await axiosInstance.post("/auth/register", userData);
     return response.data;
   },
+  forgotPassword: async (email) => {
+    const response = await axiosInstance.post("/auth/forgot-password", { email });
+    return response.data;
+  },
+  resetPassword: async (data) => {
+    const response = await axiosInstance.post("/auth/reset-password", data);
+    return response.data;
+  }
 };
 
 export const termsAPI = {
@@ -106,4 +114,11 @@ export const assignmentAPI = {
     );
     return response.data;
   },
+};
+
+export const dashboardAPI = {
+  getAdminSummary: async () => {
+    const response = await axiosInstance.get("/dashboard/admin/summary");
+    return response.data;
+  }
 };

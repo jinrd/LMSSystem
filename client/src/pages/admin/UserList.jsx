@@ -9,8 +9,10 @@ import {
   User as UserIcon,
   Search,
   Trash2,
+  Phone,
 } from "lucide-react";
 import { userAPI } from "../../api";
+import { formatPhoneNumber } from "../../utils/format";
 
 // 역할군 한글로 변경
 const roleMap = {
@@ -242,6 +244,9 @@ export default function UserList() {
                       상태
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      연락처
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       가입일
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">
@@ -311,6 +316,12 @@ export default function UserList() {
                           ) : (
                             <span className="text-slate-400 text-sm px-2 font-medium">해당 없음</span>
                           )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2 text-slate-600">
+                            <Phone className="w-4 h-4 text-slate-400" />
+                            <span className="text-sm">{user.phone ? formatPhoneNumber(user.phone) : "없음"}</span>
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 text-slate-600">

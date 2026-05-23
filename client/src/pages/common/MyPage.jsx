@@ -2,11 +2,13 @@
 /* eslint-disable react-hooks/immutability */
 import React, { useState, useEffect } from "react";
 import { userAPI } from "../../api";
+import { formatPhoneNumber } from "../../utils/format";
 
 export default function MyPage() {
   const [userInfo, setUserInfo] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState("");
+  const [editPhone, setEditPhone] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   // 비밀번호 변경 관련 상태
@@ -24,6 +26,7 @@ export default function MyPage() {
       const data = await userAPI.getMe();
       setUserInfo(data);
       setEditName(data.name);
+      setEditPhone(formatPhoneNumber(data.phone || ""));
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -42,7 +45,7 @@ export default function MyPage() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: editName }),
+        body: JSON.stringify({ name: editName, phone: editPhone }),
       });
       if (res.ok) {
         alert("정보가 성공적으로 수정되었습니다.");
@@ -188,6 +191,19 @@ export default function MyPage() {
                 className="w-full border p-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                전화번호
+              </label>
+              <input
+                type="tel"
+                value={editPhone}
+                onChange={(e) => setEditPhone(formatPhoneNumber(e.target.value))}
+                disabled={!isEditing}
+                placeholder="010-1234-5678"
+                className="w-full border p-2 rounded-lg bg-gray-50 disabled:text-gray-500 disabled:border-gray-200 focus:bg-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              />
+            </div>
 
             <div className="pt-4 flex gap-2">
               {isEditing ? (
@@ -203,6 +219,7 @@ export default function MyPage() {
                     onClick={() => {
                       setIsEditing(false);
                       setEditName(userInfo.name);
+                      setEditPhone(formatPhoneNumber(userInfo.phone || ""));
                     }}
                     className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
                   >
@@ -219,7 +236,7 @@ export default function MyPage() {
                   }}
                   className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-bold hover:bg-gray-50"
                 >
-                  이름 변경하기
+                  수정하기
                 </button>
               )}
             </div>
