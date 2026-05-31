@@ -44,14 +44,56 @@ export default function InquiryList() {
   if (loading) return <div className="p-8">로딩 중...</div>;
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-4 md:p-8 pb-20 md:pb-8 max-w-6xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800">1:1 문의 관리</h1>
         <p className="text-slate-500 mt-1">학생들의 문의 사항을 확인하고 답변을 작성합니다.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        <table className="w-full text-left text-sm text-slate-600">
+      {/* 모바일 뷰 (카드형) */}
+      <div className="md:hidden flex flex-col gap-4">
+        {inquiries.length === 0 ? (
+          <div className="text-center text-slate-500 py-8 bg-white rounded-2xl border border-slate-100">등록된 문의가 없습니다.</div>
+        ) : (
+          inquiries.map((inq) => (
+            <div key={inq.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col gap-3">
+              <div className="flex justify-between items-start mb-1">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide ${inq.status === "ANSWERED" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                  {inq.status === "ANSWERED" ? "답변완료" : "답변대기"}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {new Date(inq.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              
+              <h3 className="font-bold text-slate-800 text-base leading-snug break-words">
+                {inq.title}
+              </h3>
+              
+              <div className="flex justify-between items-center mt-2 border-t border-slate-50 pt-3">
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-slate-700">{inq.student?.name}</span>
+                  <span className="text-xs text-slate-400">{inq.student?.email}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedInquiry(inq);
+                    setAnswer(inq.answer || "");
+                  }}
+                  className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700 rounded-xl text-sm font-bold transition-colors"
+                >
+                  상세/답변
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* PC 뷰 (테이블형) */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-600 min-w-[800px]">
           <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
             <tr>
               <th className="px-6 py-4 font-semibold w-24">상태</th>
@@ -107,6 +149,7 @@ export default function InquiryList() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {selectedInquiry && (
