@@ -35,6 +35,10 @@ model User {
   resetPasswordToken    String?       // 비밀번호 재설정용 고유 토큰값(예 : UUID 또는 랜덤 문자열)
   resetPasswordExpires  DateTime?     // 비밀번호 재설정용 토큰 만료 시간(보통 생성 후 1시간)
 
+  // 질문 관계용
+  inquiries         Inquiry[]     @relation("StudentInquiries")
+  answeredInquiries Inquiry[]     @relation("AnsweredInquiries")
+
   // 이메일 검색 속도 향상을 위한 인덱싱
   @@index([email])
 }
@@ -166,4 +170,37 @@ model Submission {
   
   // 한 학생은 하나의 과제에 대해 하나의 제출물만 가짐 (중복 제출 방지)
   @@unique([assignmentId, studentId])
+}
+
+// 에러 및 시스템 히스토리 로그 모델
+model SystemLog {
+  id        Int       @id @default(autoincrement())
+  level     String    // "ERROR", "INFO", "WARN"
+  message   String    // 에러 메세지 또는 히스토리 내용
+  stack     String?   // 에러 스택 트레이스 (선택)
+  userId    Int?      // 관련된 사용자 ID(있을 경우)
+  route     String?   // 에러가 발생한 API 라우트
+  createdAt DateTime @default(now())
+}
+
+
+// 1:1 문의 (Q&A) 모델
+model Inquiry {
+  id      Int       @id @default(autoincrement())
+  title   String
+  content String
+  status  String    @default("PENDING")   // "PENDING"(답변대기), "ANSWERED"(답변완료)
+
+  // 질문한 학생
+  studentId   Int
+  student     User  @relation("StudentInquiries", fields: [studentId], references: [id], onDelete: Cascade)
+
+  // 답변 내용 및 답변한 강사/관리자
+  answer      String?
+  answeredById  Int?
+  answeredBy   User?    @relation("AnsweredInquiries", fields: [answeredById], references: [id], onDelete: SetNull)
+  answeredAt    DateTime?
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }

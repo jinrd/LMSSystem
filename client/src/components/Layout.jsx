@@ -9,6 +9,8 @@ import {
   Bell,
   LogOut,
   UserCircle,
+  MessageSquare,
+  Activity
 } from "lucide-react";
 
 export default function Layout() {
@@ -39,6 +41,8 @@ export default function Layout() {
       path: "/admin/schedule",
       icon: <CalendarDays size={20} />,
     },
+    { name: "1:1 문의 관리", path: "/admin/inquiries", icon: <MessageSquare size={20} /> },
+    { name: "시스템 로그", path: "/admin/system-logs", icon: <Activity size={20} /> },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
     { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
@@ -49,6 +53,7 @@ export default function Layout() {
       path: "/dashboard",
       icon: <LayoutDashboard size={20} />,
     },
+    { name: "1:1 문의", path: "/student/inquiries", icon: <MessageSquare size={20} /> },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
     { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];
@@ -59,6 +64,7 @@ export default function Layout() {
       path: "/dashboard",
       icon: <LayoutDashboard size={20} />,
     },
+    { name: "1:1 문의 관리", path: "/admin/inquiries", icon: <MessageSquare size={20} /> },
     { name: "공지사항", path: "/notices", icon: <Bell size={20} /> },
     { name: "마이페이지", path: "/mypage", icon: <UserCircle size={20} /> },
   ];

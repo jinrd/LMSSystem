@@ -16,6 +16,8 @@ import courseRoutes from "./routes/courseRoutes";
 import noticeRoutes from "./routes/noticeRoutes";
 import classRoutes from "./routes/classRoutes";
 import assignmentRoutes from "./routes/assignmentRoutes";
+import inquiryRoutes from "./routes/inquiryRoutes";
+import systemLogRoutes from "./routes/systemLogRoutes";
 import errorHandler from "./middlewares/errorHandler";
 
 const app = express();
@@ -50,6 +52,8 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/notices", noticeRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/inquiries", inquiryRoutes);
+app.use("/api/system-logs", systemLogRoutes);
 
 // 전역 에러 핸들러
 app.use(errorHandler);

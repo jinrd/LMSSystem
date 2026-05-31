@@ -14,6 +14,9 @@ import DashboardSwitcher from "./pages/common/DashboardSwitcher";
 import MyPage from "./pages/common/MyPage";
 import TeacherClassDetail from "./pages/teacher/TeacherClassDetail";
 import StudentClassDetail from "./pages/student/StudentClassDetail";
+import Inquiry from "./pages/student/Inquiry";
+import InquiryList from "./pages/admin/InquiryList";
+import SystemLogs from "./pages/admin/SystemLogs";
 
 /**
  * 1. 관리자 전용 보호 라우트
@@ -180,6 +183,25 @@ function App() {
           element={
             <AdminRoute>
               <AdminSchedule />
+            </AdminRoute>
+          }
+        />
+
+        {/* 1:1 문의 및 에러 로그 */}
+        <Route path="/student/inquiries" element={<Inquiry />} />
+        <Route
+          path="/admin/inquiries"
+          element={
+            <TeacherRoute>
+              <InquiryList />
+            </TeacherRoute>
+          }
+        />
+        <Route
+          path="/admin/system-logs"
+          element={
+            <AdminRoute>
+              <SystemLogs />
             </AdminRoute>
           }
         />

@@ -122,3 +122,25 @@ export const dashboardAPI = {
     return response.data;
   }
 };
+
+export const inquiryAPI = {
+  getInquiries: async () => {
+    const response = await axiosInstance.get("/inquiries");
+    return response.data;
+  },
+  createInquiry: async (data) => {
+    const response = await axiosInstance.post("/inquiries", data);
+    return response.data;
+  },
+  answerInquiry: async (id, data) => {
+    const response = await axiosInstance.patch(`/inquiries/${id}/answer`, data);
+    return response.data;
+  }
+};
+
+export const systemLogAPI = {
+  getSystemLogs: async () => {
+    const response = await axiosInstance.get("/system-logs");
+    return response.data;
+  }
+};
